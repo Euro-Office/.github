@@ -71,3 +71,5 @@ Check the [DocumentServer repository](https://github.com/Euro-Office/DocumentSer
 	* We believe open source is about collaboration and we look for oportunities for integration and collaboration with the LibreOffice community and companies like Collabora. There are already some ideas how to collaborate for example in the document converter. 
 * Can I buy support or a subscription for Euro-Office?
 	* Not at the moment, but in the future some of the contributing companies might offer support subscriptions
+* Is Euro-Office just for Europeans? Isn't open source without borders?
+    * Open Source is an international movement, and we are definitely open to contributios by anyone, anywhere! All code will be judged on its merits, not on its origin, and receive equal review. And, of course, anyone is welcome to use Euro-Office in line with the provisions [in the AGPLv3 license!](https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License)
