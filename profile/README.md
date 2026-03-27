@@ -33,9 +33,12 @@ Current contributors and supporters include:
 
 * IONOS
 * Nextcloud
+* EuroStack
 * XWiki
 * OpenProject
 * Proton
+* Soverin
+* Abilian
 * BTactic
 * You?
 
@@ -52,6 +55,8 @@ Why did we resort to a fork, rather than collaborate? Of course, forking should 
 ## Get involved
 Get involved! You can file issues, propose pull requests and more. We are looking forward to make the digital sovereign office space better than ever before!
 
+Check the [DocumentServer repository](https://github.com/Euro-Office/DocumentServer) on how to get started running and contributing to Euro-Office!
+
 ## FAQ
 * What is Euro-Office?
     * An online office component for real-time collaborative editing of Office documents like DOCX, PPTX, XLSX as well as the ODF file formats ODS, ODT and ODP.
@@ -59,10 +64,10 @@ Get involved! You can file issues, propose pull requests and more. We are lookin
 * How does Euro-Office compare to IONOS Workspace, office.eu, the Proton productivity suite, Nextcloud Hub or XWiki:
     * Euro-Office is more of an integration component. It merely handles document editing itself. Storage, as well as navigation, permissions and sharing logic has to be offered by a platform it is integrated in, like Proton Docs, Nextcloud Hub or OpenProject.
 * Who started Euro-Office?
-    * Euro-Office is an initiative of a group of European companies who saw a need for a real open, sovereign online office suite that works well with the proprietary file formats of Microsoft. Initial contributors and supporters include IONOS, Nextcloud, Proton, XWiki, OpenProject, Open-Xchange, BTactic and others.
+    * Euro-Office is an initiative of a group of European companies who saw a need for a real open, sovereign online office suite that works well with the proprietary file formats of Microsoft. Initial contributors and supporters include IONOS, Nextcloud, Eurostack, XWiki, OpenProject, Soverin, Abilian, BTactic and others.
 * Why was a new office suite needed
-	* We saw a need for a modern suite with a great MS compatibility and excellent desktop and mobile applications.
+	* We saw a need for a more modern suite with a great MS compatibility and excellent desktop and mobile applications.
 * Why did you not work with libreoffice and collabora online?
-	* We believe open source is about collaboration and we look for oportunities for integration and collaboration with the LibreOffice community and companies like Collabora. There are already some idea how to collaborate for example in the document converter. 
+	* We believe open source is about collaboration and we look for oportunities for integration and collaboration with the LibreOffice community and companies like Collabora. There are already some ideas how to collaborate for example in the document converter. 
 * Can I buy support or a subscription for Euro-Office?
 	* Not at the moment, but in the future some of the contributing companies might offer support subscriptions
