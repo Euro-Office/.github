@@ -27,7 +27,7 @@ With Euro-Office you can view, edit and work with others on spreadsheets, docume
 
 ## About the community
 
-Euro-Office is open source and developed in public by a community of individuals and organizations. We welcome contributions from anyone, including individuals, companies, public organizations and non-profits. We are encourage anyone who cares about free and open source, modern office technology to get involved! Our goal is to have as few barriers as possible to contribution.
+Euro-Office is open source and developed in public by a community of individuals and organizations. We welcome contributions from anyone, including individuals, companies, public organizations and non-profits. We encourage anyone who cares about free and open source, modern office technology to get involved! Our goal is to have as few barriers as possible to contribution.
 
 Current contributors and supporters include:
 
@@ -72,4 +72,4 @@ Check the [DocumentServer repository](https://github.com/Euro-Office/DocumentSer
 * Can I buy support or a subscription for Euro-Office?
 	* Not at the moment, but in the future some of the contributing companies might offer support subscriptions
 * Is Euro-Office just for Europeans? Isn't open source without borders?
-    * Open Source is an international movement, and we are definitely open to contributios by anyone, anywhere! All code will be judged on its merits, not on its origin, and receive equal review. And, of course, anyone is welcome to use Euro-Office in line with the provisions [in the AGPLv3 license!](https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License)
+    * Open Source is an international movement, and we are definitely open to contributions by anyone, anywhere! All code will be judged on its merits, not on its origin, and receive equal review. And, of course, anyone is welcome to use Euro-Office in line with the provisions [in the AGPLv3 license!](https://en.wikipedia.org/wiki/GNU_Affero_General_Public_License)
