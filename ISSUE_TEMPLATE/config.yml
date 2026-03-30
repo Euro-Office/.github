@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 Euro-Office contributors
+# SPDX-License-Identifier: CC0-1.0
+
+blank_issues_enabled: false
+contact_links:
+  - name: Euro-Office Roadmap
+    url: https://github.com/Euro-Office/.github/blob/main/ROADMAP.md
+    about: Check the project roadmap for planned features and priorities.
+  - name: Contributing Guide
+    url: https://github.com/Euro-Office/.github/blob/main/CONTRIBUTING.md
+    about: Read the contributing guide before opening an issue or PR.
