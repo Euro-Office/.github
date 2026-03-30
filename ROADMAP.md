@@ -150,7 +150,7 @@ Euro-Office is driven by a growing consortium of European organizations committe
 - German Universities — coordinated adoption and contribution through ZKI member institutions
 
 ### Community & Public Sector
-- Graphwiz.ai — AI-powered graph and diagram intelligence
+- graphwiz.ai Consulting
 - Heinlein B1 — managed hosting and IT services provider
 - Knoppix — the iconic Linux live system, supporting open-source office technology
 - Additional partners welcome — see [how to get involved](#how-to-get-involved)
