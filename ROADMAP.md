@@ -202,4 +202,29 @@ Findings from the initial codebase audit (March 2026):
 | Desktop packaging | RPM + Debian + Windows exist; no Flatpak/Snap/AppImage | Low — gaps identified |
 | CI/CD | 66 workflows across 12/19 repos | Good — 7 repos need CI |
 | Nextcloud integration | Mature (46 PHP files) | Done |
-| Dependency licensing | Audit in progress | TBD |
+| Dependency licensing | **2 critical issues found** | See details below |
+
+### Critical License Issues
+
+| Dependency | Location | License | Problem |
+|---|---|---|---|
+| **x265** (HEIF codec) | `core/Common/3dParty/heif/` | **GPLv2** | Incompatible with AGPLv3. Statically linked. Needs commercial license or replacement. |
+| **dmdb** (DaMeng DB driver) | `server/DocService/` | **None / Proprietary** | No license declared. Proprietary code in AGPL project = violation. Remove or isolate. |
+
+### Medium License Concerns
+
+| Dependency | Location | License | Problem |
+|---|---|---|---|
+| libde265 | `core/Common/3dParty/heif/` | LGPLv3 / GPLv2+ | Statically linked, LGPL compliance required |
+| sharp (bundles libvips) | `server/DocService/` | Apache-2.0 wraps LGPL-2.1+ | Static linking of LGPL libvips needs compliance |
+| Qt 5.15 | `desktop-sdk/` | LGPLv3 | Desktop only — ensure dynamic linking or provide object files |
+| libVLC | `desktop-sdk/` | LGPL2.1 | Desktop only — same LGPL compliance requirements |
+| Ace Editor | `web-apps/vendor/ace/` | MIT | Bundled but missing from 3DPARTY.md |
+| SocketRocket, IXWebSocket, GLEW | `core/Common/3dParty/` | Unknown | No LICENSE files in repo — needs verification |
+
+### Recommended Actions
+
+1. **x265**: Obtain a commercial license, switch to LGPLv3-only codecs, or disable HEIF support in AGPL distributions
+2. **dmdb**: Remove from AGPL codebase or isolate into a separate non-AGPL plugin
+3. **Missing 3DPARTY.md entries**: Add Ace Editor, select2, bootstrap-select, Sparkle, SocketRocket, IXWebSocket, GLEW, POLE
+4. **Stale entries**: Remove `fakeredis` from server/3DPARTY.md (not in any package.json)
