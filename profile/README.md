@@ -52,7 +52,7 @@ Why did we resort to a fork, rather than collaborate? Of course, forking should 
 * The mobile apps are not really open source but just wrappers. Example. The apps have extensive proprietary sections which will need to be re-implemented. Work on this is underway.
 * ONLYOFFICE is a Russian company (despite many attempts to hide this), and nearly all developers reside in Russia. Open Source is a global effort, but current political situation makes collaboration hard and trust difficult to earn. Especially when development is not transparent and open. A lot of users and customers require software that is not potentially influenced or controlled by the Russian government.
 
-### governance
+### Governance
 
 We are in the process of setting up a transparent governance structure with a steering committee. In the mean time, we will follow the open source 'who codes, decides' model.
 
