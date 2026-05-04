@@ -31,16 +31,18 @@ Euro-Office is open source and developed in public by a community of individuals
 
 Current contributors and supporters include:
 
+* Abilian
+* BTactic
+* EuroStack
 * IONOS
 * Nextcloud
-* EuroStack
-* XWiki
+* Office.EU
+* Open-Xchange
 * OpenProject
 * Proton
 * Soverin
-* Abilian
-* BTactic
-* You?
+* XWiki
+* **Want to see your organization here?** We welcome new contributors and supporters! Reach out to us.
 
 ### Euro-Office liberates the ONLYOFFICE code base
 
