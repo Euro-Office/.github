@@ -31,16 +31,18 @@ Euro-Office is open source and developed in public by a community of individuals
 
 Current contributors and supporters include:
 
+* Abilian
+* BTactic
+* EuroStack
 * IONOS
 * Nextcloud
-* EuroStack
-* XWiki
+* Office.EU
+* Open-Xchange
 * OpenProject
 * Proton
 * Soverin
-* Abilian
-* BTactic
-* You?
+* XWiki
+* **Want to see your organization here?** We welcome new contributors and supporters! Reach out to us.
 
 ### Euro-Office liberates the ONLYOFFICE code base
 
@@ -48,9 +50,17 @@ Euro-Office is based on the ONLYOFFICE Open Source, an AGPL codebase. This code 
 Why did we resort to a fork, rather than collaborate? Of course, forking should be a last resort. Unfortunately, open collaboration with ONLYOFFICE was not possible, for a number of reasons:
 * Contributing is impossible or greatly discouraged. ONLYOFFICE typically does not review or accept pull requests. Build instructions are unreliable, outdated or just plain broken.
 * The company regularly makes controversial decisions like closing off features in the mobile apps like mobile editing, and the removal of an administrator panel.
-* Lacking transparency. Commit messages, when visible, often just refer to an issue number in an internal issue tracker. There are quite a number of binary blobs and compiled or obfuscated code blobs. Most internal code comments are Russian which makes is hard to work with. 
+* Lacking transparency. Commit messages, when visible, often just refer to an issue number in an internal issue tracker. There are quite a number of binary blobs and compiled or obfuscated code blobs. Most internal code comments are Russian which makes is hard to work with.
 * The mobile apps are not really open source but just wrappers. Example. The apps have extensive proprietary sections which will need to be re-implemented. Work on this is underway.
 * ONLYOFFICE is a Russian company (despite many attempts to hide this), and nearly all developers reside in Russia. Open Source is a global effort, but current political situation makes collaboration hard and trust difficult to earn. Especially when development is not transparent and open. A lot of users and customers require software that is not potentially influenced or controlled by the Russian government.
+
+### Code of conduct
+See our [Code of Conduct here.](https://github.com/Euro-Office/.github/blob/main/CODE_OF_CONDUCT.md)
+
+## Get involved
+Get involved! You can file issues, propose pull requests and more. We are looking forward to make the digital sovereign office space better than ever before!
+
+Check the [DocumentServer repository](https://github.com/Euro-Office/DocumentServer) on how to get started running and contributing to Euro-Office and see the [CONTRIBUTING.md](https://github.com/Euro-Office/DocumentServer/blob/main/README.md) there for information on the process.
 
 ### Governance
 
@@ -61,13 +71,60 @@ We are in the process of setting up a transparent governance structure with a st
 * regular contributors get added to the github project based on consensus of the existing members
 * these rules can be changed by a majority vote
 
-### Code of conduct
-See our [Code of Conduct here.](https://github.com/Euro-Office/.github/blob/main/CODE_OF_CONDUCT.md)
+## Getting involved
 
-## Get involved
-Get involved! You can file issues, propose pull requests and more. We are looking forward to make the digital sovereign office space better than ever before!
+We welcome contributions from anyone. You do not need to be a project member to participate, as long as you follow the Code of Conduct.
 
-Check the [DocumentServer repository](https://github.com/Euro-Office/DocumentServer) on how to get started running and contributing to Euro-Office!
+### Individuals
+
+* You can contribute by:
+  * Reporting bugs
+  * Suggesting features
+  * Submitting pull requests (PRs)
+    - For the process, see Contribution Process
+
+### Organizations
+
+Organizations can let employees contribute as individuals, or the organization itself contribute in a more structured way:
+
+* Reach out to the project maintainers to coordinate. Contact us at euro-office-team on the proton.me mail server.
+* Share:
+  * Who will be working on the project
+  * Which roadmap items or issues you want to take on
+  * Any new proposals you plan to introduce
+* We will:
+  * Provide feedback where needed
+  * Align on scope and direction (to avoid conflicts)
+  * And when agreed, add your organization to the list of supporters
+    - (for how we decide, see Governance)
+
+### Project membership
+
+You become a project member if:
+
+* You contribute consistently and significantly over time, think 3-6 PR's merged over a few months, and
+* Existing project members agree to add you
+
+Alternatively:
+
+* If your employer formally joins the project, designated contributors may be added as members.
+
+### Collaboration principles
+
+* The project is open by default
+* Contributions are guided by:
+  * Constructive discussion
+  * Rough consensus
+  * Code quality and maintainability
+
+### Learn more about Open Source
+
+If you are new to open source, these resources are useful:
+
+* https://opensource.guide/
+* https://opensource.guide/how-to-contribute/
+* https://www.firsttimersonly.com/
+* https://docs.github.com/en/get-started/quickstart/contributing-to-projects
 
 ## FAQ
 * What is Euro-Office?
@@ -80,7 +137,7 @@ Check the [DocumentServer repository](https://github.com/Euro-Office/DocumentSer
 * Why was a new office suite needed
 	* We saw a need for a more modern suite with a great MS compatibility and excellent desktop and mobile applications.
 * Why did you not work with libreoffice and collabora online?
-	* We believe open source is about collaboration and we look for oportunities for integration and collaboration with the LibreOffice community and companies like Collabora. There are already some ideas how to collaborate for example in the document converter. 
+	* We believe open source is about collaboration and we look for opportunities for integration and collaboration with the LibreOffice community and companies like Collabora. There are already some ideas how to collaborate for example in the document converter.
 * Can I buy support or a subscription for Euro-Office?
 	* Not at the moment, but in the future some of the contributing companies might offer support subscriptions
 * Is Euro-Office just for Europeans? Isn't open source without borders?
