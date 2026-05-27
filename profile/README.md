@@ -41,6 +41,7 @@ Current contributors and supporters include:
 * OpenProject
 * Proton
 * Soverin
+* Tuta
 * XWiki
 * **Want to see your organization here?** We welcome new contributors and supporters! Reach out to us.
 
