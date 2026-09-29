@@ -1,0 +1,12 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Euro-Office shared Renovate preset, use via \"extends\": [\"github>Euro-Office/.github\"]",
+  "platformAutomerge": true,
+  "packageRules": [
+    {
+      "description": "Auto-merge everything except major updates once checks pass",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
+      "automerge": true
+    }
+  ]
+}
