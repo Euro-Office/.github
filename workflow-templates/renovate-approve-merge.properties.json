@@ -1,0 +1,10 @@
+{
+    "name": "Automated Renovate approve and merge",
+    "description": "Automatically approve Renovate pull requests. Auto-merge of non-major updates requires the github>Euro-Office/.github preset.",
+    "iconName": "octicon git-pull-request",
+    "filePatterns": [
+        "^renovate\\.json5?$",
+        "^\\.github/renovate\\.json5?$",
+        "^\\.renovaterc(\\.json5?)?$"
+    ]
+}
