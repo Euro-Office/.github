@@ -1,6 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Euro-Office shared Renovate preset, use via \"extends\": [\"github>Euro-Office/.github\"]",
+  "extends": ["helpers:pinGitHubActionDigests"],
   "platformAutomerge": true,
   "packageRules": [
     {
