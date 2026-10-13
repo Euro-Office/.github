@@ -15,26 +15,51 @@ SAMPLE_PRS=10
 # Run on PRs but must not gate merging: cleanup on close, bots, release/publish steps
 EXCLUDE_CHECKS='delete-pr-image|auto-approve|publish|release'
 
-# Checks that ran from pull_request workflows (or non-Actions apps like DCO) on a commit
+# Per PR: which workflows were triggered/completed, which checks ran and which were
+# cancelled or skipped. Non-Actions apps like DCO count as their own workflow.
 pr_checks() {
-  local repo=$1 sha=$2 suites
-  suites=$(gh api --paginate "repos/$repo/actions/runs?head_sha=$sha" \
-    --jq '.workflow_runs[] | select(.event | startswith("pull_request")) | .check_suite_id' | jq -s .)
+  local repo=$1 sha=$2 runs
+  runs=$(gh api --paginate "repos/$repo/actions/runs?head_sha=$sha" \
+    --jq '.workflow_runs[] | select(.event | startswith("pull_request")) | {suite: .check_suite_id, wf: .workflow_id}' | jq -s .)
   gh api --paginate "repos/$repo/commits/$sha/check-runs" --jq '.check_runs[]' |
-    jq -s --argjson suites "$suites" --arg exclude "$EXCLUDE_CHECKS" '[.[]
-      | select(.app.slug != "github-actions" or (.check_suite.id | IN($suites[])))
-      | select(.conclusion == "success" or .conclusion == "failure")
-      | select(.name | test($exclude; "i") | not)
-      | {context: .name, integration_id: .app.id}] | unique'
+    jq -s --argjson runs "$runs" --arg exclude "$EXCLUDE_CHECKS" '
+      ($runs | map({key: (.suite | tostring), value: .wf}) | from_entries) as $wf
+      | [.[]
+        | .wf = (if .app.slug == "github-actions" then $wf[.check_suite.id | tostring] else "app:\(.app.slug)" end)
+        | select(.wf != null and (.name | test($exclude; "i") | not))] as $checks
+      | ($checks | map(select(.conclusion == "success" or .conclusion == "failure"))) as $done
+      | {
+          triggered: ([$runs[].wf] + [$checks[].wf] | unique),
+          completed: ([$done[].wf] | unique),
+          ran: ([$done[] | {context: .name, integration_id: .app.id, wf}] | unique),
+          # Matrix jobs cancelled before expanding only report their base name
+          abstain: ([$checks[] | select(.conclusion == "cancelled" or .conclusion == "skipped") | .name | sub(" \\(.*"; "")] | unique)
+        }'
 }
 
-# Checks that ran on at least half of the last merged PRs, so path-filtered workflows
-# and PRs without CI (e.g. opened by bots via GITHUB_TOKEN) drop out
+# Vote over the last merged PRs with completed Actions CI (drops bot PRs without CI):
+# - a workflow must have been triggered on at least half of them (drops path-filtered ones)
+# - a check is required if it ran at least as often as it was missing from a completed
+#   run of its workflow; cancelled/skipped runs don't vote, so renamed matrix jobs and
+#   cancelled builds don't push current jobs out
+# - it must have run in the newest PR where its workflow completed (drops renamed jobs)
 required_checks() {
   local repo=$1 sha
-  for sha in $(gh pr list -R "$repo" --state merged --limit "$SAMPLE_PRS" --json headRefOid --jq '.[].headRefOid'); do
+  for sha in $(gh pr list -R "$repo" --state merged --limit "$SAMPLE_PRS" --json headRefOid,mergedAt \
+      --jq 'sort_by(.mergedAt) | reverse | .[].headRefOid'); do
     pr_checks "$repo" "$sha"
-  done | jq -s 'length as $n | [.[][]] | group_by(.) | map(select(length * 2 >= $n) | .[0])'
+  done | jq -s '
+    map(select(any(.completed[]; type == "number"))) as $prs
+    | [$prs[].ran[]] | unique
+    | map(. as $c
+        | select(([$prs[] | select(.triggered | index([$c.wf]))] | length) * 2 >= ($prs | length))
+        | select(([$prs[] | select(.ran | index([$c]))] | length)
+              >= ([$prs[] | select((.completed | index([$c.wf])) and (.ran | index([$c]) | not)
+                    and (.abstain | index([$c.context | sub(" \\(.*"; "")]) | not))] | length))
+        | select([$prs[] | select((.completed | index([$c.wf])) and (.abstain | index([$c.context | sub(" \\(.*"; "")]) | not))][0]
+            | .ran | index([$c]))
+        | {context, integration_id})
+    | unique'
 }
 
 ruleset() {
