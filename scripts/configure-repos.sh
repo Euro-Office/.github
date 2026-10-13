@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Applies the org-wide repo settings: auto-merge on, Discussions off, and a "main"
 # ruleset that blocks force pushes and deletions, requires 1 approval and requires
-# the CI checks that ran on most of the last merged PRs.
+# the CI checks listed below.
 # Commit comments cannot be set via API, disable them in the org settings instead.
 # Usage: configure-repos.sh [--dry-run] OWNER/REPO [OWNER/REPO...]
 set -euo pipefail
@@ -11,55 +11,63 @@ DRY_RUN=false
 [ $# -gt 0 ] || { echo "Usage: $0 [--dry-run] OWNER/REPO [OWNER/REPO...]" >&2; exit 1; }
 
 RULESET_NAME="main"
-SAMPLE_PRS=10
-# Run on PRs but must not gate merging: cleanup on close, bots, release/publish steps
-EXCLUDE_CHECKS='delete-pr-image|auto-approve|publish|release'
 
-# Per PR: which workflows were triggered/completed, which checks ran and which were
-# cancelled or skipped. Non-Actions apps like DCO count as their own workflow.
-pr_checks() {
-  local repo=$1 sha=$2 runs
-  runs=$(gh api --paginate "repos/$repo/actions/runs?head_sha=$sha" \
-    --jq '.workflow_runs[] | select(.event | startswith("pull_request")) | {suite: .check_suite_id, wf: .workflow_id}' | jq -s .)
-  gh api --paginate "repos/$repo/commits/$sha/check-runs" --jq '.check_runs[]' |
-    jq -s --argjson runs "$runs" --arg exclude "$EXCLUDE_CHECKS" '
-      ($runs | map({key: (.suite | tostring), value: .wf}) | from_entries) as $wf
-      | [.[]
-        | .wf = (if .app.slug == "github-actions" then $wf[.check_suite.id | tostring] else "app:\(.app.slug)" end)
-        | select(.wf != null and (.name | test($exclude; "i") | not))] as $checks
-      | ($checks | map(select(.conclusion == "success" or .conclusion == "failure"))) as $done
-      | {
-          triggered: ([$runs[].wf] + [$checks[].wf] | unique),
-          completed: ([$done[].wf] | unique),
-          ran: ([$done[] | {context: .name, integration_id: .app.id, wf}] | unique),
-          # Matrix jobs cancelled before expanding only report their base name
-          abstain: ([$checks[] | select(.conclusion == "cancelled" or .conclusion == "skipped") | .name | sub(" \\(.*"; "")] | unique)
-        }'
-}
+# Required on every repo
+GENERAL_CHECKS="DCO"
 
-# Vote over the last merged PRs with completed Actions CI (drops bot PRs without CI):
-# - a workflow must have been triggered on at least half of them (drops path-filtered ones)
-# - a check is required if it ran at least as often as it was missing from a completed
-#   run of its workflow; cancelled/skipped runs don't vote, so renamed matrix jobs and
-#   cancelled builds don't push current jobs out
-# - it must have run in the newest PR where its workflow completed (drops renamed jobs)
-required_checks() {
-  local repo=$1 sha
-  for sha in $(gh pr list -R "$repo" --state merged --limit "$SAMPLE_PRS" --json headRefOid,mergedAt \
-      --jq 'sort_by(.mergedAt) | reverse | .[].headRefOid'); do
-    pr_checks "$repo" "$sha"
-  done | jq -s '
-    map(select(any(.completed[]; type == "number"))) as $prs
-    | [$prs[].ran[]] | unique
-    | map(. as $c
-        | select(([$prs[] | select(.triggered | index([$c.wf]))] | length) * 2 >= ($prs | length))
-        | select(([$prs[] | select(.ran | index([$c]))] | length)
-              >= ([$prs[] | select((.completed | index([$c.wf])) and (.ran | index([$c]) | not)
-                    and (.abstain | index([$c.context | sub(" \\(.*"; "")]) | not))] | length))
-        | select([$prs[] | select((.completed | index([$c.wf])) and (.abstain | index([$c.context | sub(" \\(.*"; "")]) | not))][0]
-            | .ran | index([$c]))
-        | {context, integration_id})
-    | unique'
+# Required per repo, one check name per line. Names must match exactly, including the
+# "..." GitHub appends when truncating long matrix job names.
+repo_checks() {
+  case "$1" in
+    Euro-Office/core) echo "build
+build-wasm
+build-wasm-summary
+changes" ;;
+    Euro-Office/DesktopEditors) echo "brand-assets (euro-office, false)
+brand-assets (nextcloud-office, ./brands/nextcloud-office-brand/brand-desktop.hcl, nextcloud-offi...
+build-common (euro-office, desktop-common, Euro-Office, Euro-Office, .)
+build-common (nextcloud-office, no-desktop-common, Nextcloud Office, Nextcloud Office, ./build/br...
+build-linux (amd64, euro-office, Euro-Office, Euro-Office, .)
+build-linux (amd64, nextcloud-office, Nextcloud Office, Nextcloud Office, ./build/brands/nextclou...
+build-linux (arm64, euro-office, Euro-Office, Euro-Office, .)
+build-linux (arm64, nextcloud-office, Nextcloud Office, Nextcloud Office, ./build/brands/nextclou...
+build-macos (euro-office, desktop-apps/macos/Euro-Office.xcodeproj, Euro-Office-arm, Euro-Office....
+build-macos (nextcloud-office, desktop-apps/macos/Euro-Office.xcodeproj, Euro-Office-arm, Nextclo...
+build-windows (amd64, euro-office, Euro-Office, Euro-Office, false)
+build-windows (amd64, nextcloud-office, Nextcloud Office, Nextcloud Office, true)
+build-windows (arm64, euro-office, Euro-Office, Euro-Office, false)
+build-windows (arm64, nextcloud-office, Nextcloud Office, Nextcloud Office, true)
+crosscompile-3rdparty-arm64
+version" ;;
+    Euro-Office/document-server-integration) echo "Lint
+artifact
+licences
+licences (8.2)
+lint
+lint (8.2)" ;;
+    Euro-Office/documentation) echo "build" ;;
+    Euro-Office/DocumentServer) echo "build (amd64, euro-office, documentserver, cluster-docs, cluster-example, cluster-utils)
+build (amd64, nextcloud-office, nextcloud-office-documentserver, nextcloud-office-cluster-docs, n...
+build (arm64, euro-office, documentserver, cluster-docs, cluster-example, cluster-utils)
+build (arm64, nextcloud-office, nextcloud-office-documentserver, nextcloud-office-cluster-docs, n...
+clone
+e2e
+upgrade" ;;
+    Euro-Office/eurooffice-nextcloud) echo "Lint
+Packaging filter
+artifact
+php-cs
+php-lint (8.1)
+php-lint (8.2)
+php-lint (8.3)
+php-lint (8.4)" ;;
+    Euro-Office/sdkjs) echo "build-test
+code-style
+unit-tests" ;;
+    Euro-Office/server) echo "e2e" ;;
+    Euro-Office/web-apps) echo "e2e
+unit-tests" ;;
+  esac
 }
 
 ruleset() {
@@ -89,8 +97,8 @@ ruleset() {
 
 for repo in "$@"; do
   echo "==> $repo"
-  checks=$(required_checks "$repo")
-  jq -r 'if . == [] then "    required checks: none found" else "    required checks:", (.[] | "      - \(.context)") end' <<<"$checks"
+  checks=$(printf '%s\n%s\n' "$GENERAL_CHECKS" "$(repo_checks "$repo")" | jq -R 'select(. != "") | {context: .}' | jq -s .)
+  jq -r '"    required checks:", (.[] | "      - \(.context)")' <<<"$checks"
   $DRY_RUN && continue
 
   gh repo edit "$repo" --enable-auto-merge --enable-discussions=false
