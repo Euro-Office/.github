@@ -80,7 +80,9 @@ sync_repo() {
   local body="Automated sync from https://github.com/$ORG/.github/tree/main/workflow-templates:"$'\n'
   for i in "${!changed[@]}"; do
     gh api -X PUT "repos/$repo/contents/.github/workflows/${changed[$i]}.yml" \
-      -f message="ci: sync ${changed[$i]} workflow from organization template" \
+      -f message="ci: sync ${changed[$i]} workflow from organization template"$'\n\n'"Signed-off-by: $AUTHOR_NAME <$AUTHOR_EMAIL>" \
+      -f "author[name]=$AUTHOR_NAME" -f "author[email]=$AUTHOR_EMAIL" \
+      -f "committer[name]=$AUTHOR_NAME" -f "committer[email]=$AUTHOR_EMAIL" \
       -f branch="$BRANCH" \
       -f content="$(base64 <<< "${contents[$i]}" | tr -d '\n')" \
       ${shas[$i]:+-f sha="${shas[$i]}"} >/dev/null || return 1
@@ -94,6 +96,13 @@ sync_repo() {
     gh pr create --repo "$repo" --base "$default_branch" --head "$BRANCH" --title "$TITLE" --body "$body"
   fi
 }
+
+# Commits are authored and signed off as the token's user to satisfy the DCO check
+if [[ "$DRY_RUN" == false ]]; then
+  read -r AUTHOR_NAME AUTHOR_ID < <(gh api user --jq '"\(.login) \(.id)"')
+  [[ -n "${AUTHOR_ID:-}" ]] || { echo "Could not resolve the token's user" >&2; exit 1; }
+  AUTHOR_EMAIL="$AUTHOR_ID+$AUTHOR_NAME@users.noreply.github.com"
+fi
 
 if [[ ${#REPOS[@]} -eq 0 ]]; then
   while IFS= read -r repo; do REPOS+=("$repo"); done \
