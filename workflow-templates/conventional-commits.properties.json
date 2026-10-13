@@ -1,0 +1,6 @@
+{
+    "name": "Conventional commits",
+    "description": "Require conventional commit format for PR titles and commit subjects.",
+    "iconName": "octicon git-commit",
+    "filePatterns": [".*"]
+}
