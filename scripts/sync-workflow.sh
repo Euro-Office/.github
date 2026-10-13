@@ -70,12 +70,12 @@ sync_repo() {
 
   [[ "$DRY_RUN" == true ]] && return 0
 
-  local base_sha
+  # Commits are built on a temporary branch and the sync branch is then moved in one step:
+  # resetting the sync branch to the base first would leave an open PR empty and GitHub closes it
+  local base_sha head_sha tmp_branch="$BRANCH-tmp"
   base_sha=$(gh api "repos/$repo/git/ref/heads/$default_branch" --jq .object.sha) || return 1
-  # Force-reset instead of delete, so an already open sync PR stays open and gets refreshed
-  gh api -X PATCH "repos/$repo/git/refs/heads/$BRANCH" -f sha="$base_sha" -F force=true >/dev/null 2>&1 \
-    || gh api "repos/$repo/git/refs" -f ref="refs/heads/$BRANCH" -f sha="$base_sha" >/dev/null \
-    || return 1
+  gh api -X DELETE "repos/$repo/git/refs/heads/$tmp_branch" >/dev/null 2>&1 || true
+  gh api "repos/$repo/git/refs" -f ref="refs/heads/$tmp_branch" -f sha="$base_sha" >/dev/null || return 1
 
   local body="Automated sync from https://github.com/$ORG/.github/tree/main/workflow-templates:"$'\n'
   for i in "${!changed[@]}"; do
@@ -83,11 +83,17 @@ sync_repo() {
       -f message="ci: sync ${changed[$i]} workflow from organization template"$'\n\n'"Signed-off-by: $AUTHOR_NAME <$AUTHOR_EMAIL>" \
       -f "author[name]=$AUTHOR_NAME" -f "author[email]=$AUTHOR_EMAIL" \
       -f "committer[name]=$AUTHOR_NAME" -f "committer[email]=$AUTHOR_EMAIL" \
-      -f branch="$BRANCH" \
+      -f branch="$tmp_branch" \
       -f content="$(base64 <<< "${contents[$i]}" | tr -d '\n')" \
       ${shas[$i]:+-f sha="${shas[$i]}"} >/dev/null || return 1
     body+=$'\n'"- \`.github/workflows/${changed[$i]}.yml\`"
   done
+
+  head_sha=$(gh api "repos/$repo/git/ref/heads/$tmp_branch" --jq .object.sha) || return 1
+  gh api -X PATCH "repos/$repo/git/refs/heads/$BRANCH" -f sha="$head_sha" -F force=true >/dev/null 2>&1 \
+    || gh api "repos/$repo/git/refs" -f ref="refs/heads/$BRANCH" -f sha="$head_sha" >/dev/null \
+    || return 1
+  gh api -X DELETE "repos/$repo/git/refs/heads/$tmp_branch" >/dev/null || return 1
 
   if gh pr list --repo "$repo" --head "$BRANCH" --json number --jq '.[0].number' | grep -q .; then
     gh pr edit "$BRANCH" --repo "$repo" --body "$body" >/dev/null
