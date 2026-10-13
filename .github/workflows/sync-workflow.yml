@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: MIT
+
+name: Sync workflow template to repos
+
+on:
+  workflow_dispatch:
+    inputs:
+      template:
+        description: Template name without extension (e.g. conventional-commits). Empty updates all templates repos already have.
+        required: false
+        default: ""
+      repos:
+        description: Space separated OWNER/REPO list to limit the sync to. With a template set, it is added where missing. Empty checks all org repos.
+        required: false
+        default: ""
+      dry-run:
+        description: Only print planned changes
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-workflow
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Sync
+        env:
+          GH_TOKEN: ${{ secrets.EO_ROBOT_GITHUB_TOKEN }}
+          TEMPLATE: ${{ inputs.template }}
+          REPOS: ${{ inputs.repos }}
+          DRY_RUN: ${{ inputs.dry-run }}
+        run: |
+          args=()
+          [[ -n "$TEMPLATE" ]] && args+=(--template "$TEMPLATE")
+          [[ "$DRY_RUN" == true ]] && args+=(--dry-run)
+          for repo in $REPOS; do args+=(--repo "$repo"); done
+          ./scripts/sync-workflow.sh "${args[@]}"
