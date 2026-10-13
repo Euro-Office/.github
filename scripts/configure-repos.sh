@@ -16,8 +16,11 @@ RULESET_NAME="main"
 DCO_APP_ID=1861
 ACTIONS_APP_ID=15368
 
-# Required on every repo, reported by the DCO app
-GENERAL_CHECKS="DCO"
+# Required on every repo, one "APP_ID check name" per line.
+# conventional-commits comes from workflow-templates/ and is only required where the synced workflow has that job.
+GENERAL_CHECKS="$DCO_APP_ID DCO
+$ACTIONS_APP_ID conventional-commits"
+CONVENTIONAL_COMMITS_WORKFLOW=".github/workflows/conventional-commits.yml"
 
 # Required per repo, reported by GitHub Actions, one check name per line. Names must match exactly, including the
 # "..." GitHub appends when truncating long matrix job names.
@@ -101,8 +104,14 @@ ruleset() {
 
 for repo in "$@"; do
   echo "==> $repo"
+  general=$GENERAL_CHECKS
+  if ! gh api -H "Accept: application/vnd.github.raw" "repos/$repo/contents/$CONVENTIONAL_COMMITS_WORKFLOW" 2>/dev/null |
+      grep -q '^  conventional-commits:$'; then
+    echo "    warning: $CONVENTIONAL_COMMITS_WORKFLOW missing or outdated, not requiring conventional-commits" >&2
+    general=$(grep -v ' conventional-commits$' <<<"$general")
+  fi
   checks=$({
-    jq -R --argjson app "$DCO_APP_ID" 'select(. != "") | {context: ., integration_id: $app}' <<<"$GENERAL_CHECKS"
+    jq -R 'select(. != "") | capture("^(?<integration_id>[0-9]+) (?<context>.+)$") | .integration_id |= tonumber' <<<"$general"
     jq -R --argjson app "$ACTIONS_APP_ID" 'select(. != "") | {context: ., integration_id: $app}' <<<"$(repo_checks "$repo")"
   } | jq -s .)
   jq -r '"    required checks:", (.[] | "      - \(.context)")' <<<"$checks"
