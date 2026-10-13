@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Applies the org-wide repo settings: auto-merge on, PR branch updates allowed, Discussions off, and a "main"
 # ruleset that blocks force pushes and deletions, requires 1 approval and requires
-# the CI checks listed below.
+# the CI checks listed below. The developer teams below may bypass it when merging a PR.
 # Commit comments cannot be set via API, disable them in the org settings instead.
 # Usage: configure-repos.sh [--dry-run] OWNER/REPO [OWNER/REPO...]
 set -euo pipefail
@@ -15,6 +15,10 @@ RULESET_NAME="main"
 # Checks are pinned to the app that reports them, so nobody can fake them via the statuses API
 DCO_APP_ID=1861
 ACTIONS_APP_ID=15368
+
+# Teams allowed to merge PRs without approval or passing checks, direct pushes stay blocked
+# gh api orgs/Euro-Office/teams/SLUG --jq .id
+BYPASS_TEAM_IDS="[18051093, 17868694]" # nextcloud-developers, ionos-developers
 
 # Required on every repo, one "APP_ID check name" per line.
 # conventional-commits comes from workflow-templates/ and is only required where the synced workflow has that job.
@@ -75,10 +79,11 @@ unit-tests" ;;
 }
 
 ruleset() {
-  jq -n --arg name "$RULESET_NAME" --argjson checks "$1" '{
+  jq -n --arg name "$RULESET_NAME" --argjson checks "$1" --argjson teams "$BYPASS_TEAM_IDS" '{
     name: $name,
     target: "branch",
     enforcement: "active",
+    bypass_actors: [$teams[] | { actor_id: ., actor_type: "Team", bypass_mode: "pull_request" }],
     conditions: { ref_name: { include: ["refs/heads/main"], exclude: [] } },
     rules: ([
       { type: "non_fast_forward" },
