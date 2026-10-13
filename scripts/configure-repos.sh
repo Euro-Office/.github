@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Applies the org-wide repo settings: auto-merge on, Discussions off, and a "main"
+# Applies the org-wide repo settings: auto-merge on, PR branch updates allowed, Discussions off, and a "main"
 # ruleset that blocks force pushes and deletions, requires 1 approval and requires
 # the CI checks listed below.
 # Commit comments cannot be set via API, disable them in the org settings instead.
@@ -108,7 +108,7 @@ for repo in "$@"; do
   jq -r '"    required checks:", (.[] | "      - \(.context)")' <<<"$checks"
   $DRY_RUN && continue
 
-  gh repo edit "$repo" --enable-auto-merge --enable-discussions=false
+  gh repo edit "$repo" --enable-auto-merge --allow-update-branch --enable-discussions=false
 
   id=$(gh api "repos/$repo/rulesets" --jq ".[] | select(.name == \"$RULESET_NAME\") | .id")
   if [ -n "$id" ]; then
