@@ -12,10 +12,14 @@ DRY_RUN=false
 
 RULESET_NAME="main"
 
-# Required on every repo
+# Checks are pinned to the app that reports them, so nobody can fake them via the statuses API
+DCO_APP_ID=1861
+ACTIONS_APP_ID=15368
+
+# Required on every repo, reported by the DCO app
 GENERAL_CHECKS="DCO"
 
-# Required per repo, one check name per line. Names must match exactly, including the
+# Required per repo, reported by GitHub Actions, one check name per line. Names must match exactly, including the
 # "..." GitHub appends when truncating long matrix job names.
 repo_checks() {
   case "$1" in
@@ -97,7 +101,10 @@ ruleset() {
 
 for repo in "$@"; do
   echo "==> $repo"
-  checks=$(printf '%s\n%s\n' "$GENERAL_CHECKS" "$(repo_checks "$repo")" | jq -R 'select(. != "") | {context: .}' | jq -s .)
+  checks=$({
+    jq -R --argjson app "$DCO_APP_ID" 'select(. != "") | {context: ., integration_id: $app}' <<<"$GENERAL_CHECKS"
+    jq -R --argjson app "$ACTIONS_APP_ID" 'select(. != "") | {context: ., integration_id: $app}' <<<"$(repo_checks "$repo")"
+  } | jq -s .)
   jq -r '"    required checks:", (.[] | "      - \(.context)")' <<<"$checks"
   $DRY_RUN && continue
 
