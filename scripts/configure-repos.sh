@@ -23,7 +23,8 @@ $ACTIONS_APP_ID conventional-commits"
 CONVENTIONAL_COMMITS_WORKFLOW=".github/workflows/conventional-commits.yml"
 
 # Required per repo, reported by GitHub Actions, one check name per line. Names must match exactly, including the
-# "..." GitHub appends when truncating long matrix job names.
+# "..." GitHub appends when truncating long matrix job names. Never list jobs from workflows
+# with pull_request paths filters: they never report on unrelated PRs and block merging.
 repo_checks() {
   case "$1" in
     Euro-Office/core) echo "build
@@ -46,12 +47,8 @@ build-windows (arm64, euro-office, Euro-Office, Euro-Office, false)
 build-windows (arm64, nextcloud-office, Nextcloud Office, Nextcloud Office, true)
 crosscompile-3rdparty-arm64
 version" ;;
-    Euro-Office/document-server-integration) echo "Lint
-artifact
-licences
-licences (8.2)
-lint
-lint (8.2)" ;;
+    # Lint, licences and artifact workflows are path-filtered per example, so they can't be required
+    Euro-Office/document-server-integration) echo "e2e" ;;
     Euro-Office/documentation) echo "build" ;;
     Euro-Office/DocumentServer) echo "build (amd64, euro-office, documentserver, cluster-docs, cluster-example, cluster-utils)
 build (amd64, nextcloud-office, nextcloud-office-documentserver, nextcloud-office-cluster-docs, n...
