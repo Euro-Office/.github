@@ -31,7 +31,8 @@ LABELS=(
   "good first issue|7057ff|Good for newcomers"
   "help wanted|008672|Extra attention is needed"
   "invalid|e4e669|This doesn't seem right"
-  "nc-report|cccccc|Nextcloud testing reports"
+  "nc-report|0082c9|Nextcloud testing reports"
+  "internal-report|003d8f|Internal testing reports"
   "needs info|aaaaaa|"
   "organizational|aaaaaa|"
   "overview|000815|"
@@ -101,6 +102,7 @@ if [[ -n "$TARGET_REPO" ]]; then
   sync_repo "$TARGET_REPO"
 else
   while IFS= read -r repo; do
+    [[ "$repo" == *-rehearsal ]] && { log "SKIP $repo"; continue; }
     sync_repo "$repo"
   done < <(gh repo list "$ORG" --limit 200 --json nameWithOwner --jq '.[].nameWithOwner')
 fi
