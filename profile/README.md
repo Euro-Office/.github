@@ -25,6 +25,24 @@ With Euro-Office you can view, edit and work with others on spreadsheets, docume
 * Edit documents, spreadsheets and presentation files with others in real time
 * Save the document back to the application you used to open it or download in various file formats
 
+## Install
+
+Euro-Office is available in two builds made from the same source:
+
+* **Nextcloud Office**: signed builds for production use, with package repositories and professional support through a [Nextcloud Enterprise subscription](https://nextcloud.com/enterprise/)
+* **Euro-Office**: unsigned community builds for testing and contributing
+
+| | Nextcloud Office | Euro-Office |
+|---|---|---|
+| Desktop Editors (Windows, macOS, Linux) | [Download](https://github.com/nextcloud-releases/Office-DesktopEditors/releases/latest) | [Download](https://github.com/Euro-Office/DesktopEditors/releases/latest) |
+| Document Server (deb, rpm, Docker) | [Download](https://github.com/nextcloud-releases/Office-DocumentServer/releases) | [Download](https://github.com/Euro-Office/DocumentServer/releases/latest) |
+
+The Document Server is not a standalone application and needs a platform such as Nextcloud that stores the files. See the [installation guide](https://euro-office.github.io/documentation/installation/) for package repositories and step-by-step instructions.
+
+## Documentation
+
+The official documentation is available at [euro-office.github.io/documentation](https://euro-office.github.io/documentation/).
+
 ## About the community
 
 Euro-Office is open source and developed in public by a community of individuals and organizations. We welcome contributions from anyone, including individuals, companies, public organizations and non-profits. We encourage anyone who cares about free and open source, modern office technology to get involved! Our goal is to have as few barriers as possible to contribution.
