@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Applies the org-wide repo settings: auto-merge on, PR branch updates allowed, Discussions off, and a "main"
-# ruleset that blocks force pushes and deletions, requires 1 approval and requires
-# the CI checks listed below. The developer teams below may bypass it when merging a PR.
+# ruleset on the default branch that blocks force pushes and deletions, requires 1 approval and requires
+# the CI checks listed below. The developer teams below may bypass it when merging a PR, org and repo admins always.
 # Commit comments cannot be set via API, disable them in the org settings instead.
 # Usage: configure-repos.sh [--dry-run] OWNER/REPO [OWNER/REPO...]
 set -euo pipefail
@@ -69,6 +69,7 @@ php-lint (8.1)
 php-lint (8.2)
 php-lint (8.3)
 php-lint (8.4)" ;;
+    Euro-Office/release) echo "check" ;;
     Euro-Office/sdkjs) echo "build-test
 code-style
 unit-tests" ;;
@@ -83,8 +84,11 @@ ruleset() {
     name: $name,
     target: "branch",
     enforcement: "active",
-    bypass_actors: [$teams[] | { actor_id: ., actor_type: "Team", bypass_mode: "pull_request" }],
-    conditions: { ref_name: { include: ["refs/heads/main"], exclude: [] } },
+    bypass_actors: ([$teams[] | { actor_id: ., actor_type: "Team", bypass_mode: "pull_request" }] + [
+      { actor_id: 1, actor_type: "OrganizationAdmin", bypass_mode: "always" },
+      { actor_id: 5, actor_type: "RepositoryRole", bypass_mode: "always" }
+    ]),
+    conditions: { ref_name: { include: ["~DEFAULT_BRANCH"], exclude: [] } },
     rules: ([
       { type: "non_fast_forward" },
       { type: "deletion" },
