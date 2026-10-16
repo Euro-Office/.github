@@ -2,6 +2,8 @@
 # Applies the org-wide repo settings: auto-merge on, PR branch updates allowed, Discussions off, and a "main"
 # ruleset on the default branch that blocks force pushes and deletions, requires 1 approval and requires
 # the CI checks listed below. The developer teams below may bypass it when merging a PR, org and repo admins always.
+# A "release-tags" ruleset lets only those teams, the release team and admins create, move or delete v* tags,
+# except on the odoo repos.
 # Commit comments cannot be set via API, disable them in the org settings instead.
 # Usage: configure-repos.sh [--dry-run] OWNER/REPO [OWNER/REPO...]
 set -euo pipefail
@@ -11,6 +13,7 @@ DRY_RUN=false
 [ $# -gt 0 ] || { echo "Usage: $0 [--dry-run] OWNER/REPO [OWNER/REPO...]" >&2; exit 1; }
 
 RULESET_NAME="main"
+TAG_RULESET_NAME="release-tags"
 
 # Checks are pinned to the app that reports them, so nobody can fake them via the statuses API
 DCO_APP_ID=1861
@@ -19,6 +22,7 @@ ACTIONS_APP_ID=15368
 # Teams allowed to merge PRs without approval or passing checks, direct pushes stay blocked
 # gh api orgs/Euro-Office/teams/SLUG --jq .id
 BYPASS_TEAM_IDS="[18051093, 17868694]" # nextcloud-developers, ionos-developers
+RELEASE_TEAM_ID=20148551 # release, holds eo-robot which tags via release/.github/workflows/tag.yml
 
 # Required on every repo, one "APP_ID check name" per line.
 # conventional-commits comes from workflow-templates/ and is only required where the synced workflow has that job.
@@ -108,6 +112,31 @@ ruleset() {
   }'
 }
 
+tag_ruleset() {
+  jq -n --arg name "$TAG_RULESET_NAME" --argjson teams "$BYPASS_TEAM_IDS" --argjson release "$RELEASE_TEAM_ID" '{
+    name: $name,
+    target: "tag",
+    enforcement: "active",
+    bypass_actors: ([$teams[], $release | { actor_id: ., actor_type: "Team", bypass_mode: "always" }] + [
+      { actor_id: 1, actor_type: "OrganizationAdmin", bypass_mode: "always" },
+      { actor_id: 5, actor_type: "RepositoryRole", bypass_mode: "always" }
+    ]),
+    conditions: { ref_name: { include: ["refs/tags/v*"], exclude: [] } },
+    rules: [{ type: "creation" }, { type: "update" }, { type: "deletion" }]
+  }'
+}
+
+# Usage: upsert_ruleset REPO NAME < ruleset.json
+upsert_ruleset() {
+  local id
+  id=$(gh api "repos/$1/rulesets" --jq ".[] | select(.name == \"$2\") | .id")
+  if [ -n "$id" ]; then
+    gh api -X PUT "repos/$1/rulesets/$id" --input - >/dev/null
+  else
+    gh api -X POST "repos/$1/rulesets" --input - >/dev/null
+  fi
+}
+
 for repo in "$@"; do
   echo "==> $repo"
   general=$GENERAL_CHECKS
@@ -125,10 +154,6 @@ for repo in "$@"; do
 
   gh repo edit "$repo" --enable-auto-merge --allow-update-branch --enable-discussions=false
 
-  id=$(gh api "repos/$repo/rulesets" --jq ".[] | select(.name == \"$RULESET_NAME\") | .id")
-  if [ -n "$id" ]; then
-    ruleset "$checks" | gh api -X PUT "repos/$repo/rulesets/$id" --input - >/dev/null
-  else
-    ruleset "$checks" | gh api -X POST "repos/$repo/rulesets" --input - >/dev/null
-  fi
+  ruleset "$checks" | upsert_ruleset "$repo" "$RULESET_NAME"
+  [[ "$repo" == *odoo* ]] || tag_ruleset | upsert_ruleset "$repo" "$TAG_RULESET_NAME"
 done
