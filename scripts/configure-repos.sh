@@ -3,6 +3,8 @@
 # ruleset on the default branch that blocks force pushes and deletions, requires 1 approval and requires
 # the CI checks listed below. The PR bypass teams below may bypass it when merging a PR, nextcloud-developers and
 # org and repo admins always. Classic branch protection on the default branch is removed, rulesets replace it.
+# A "stable" ruleset applies the same to stable-* release branches, which the release team may also bypass so that
+# release/release.sh can create them.
 # A "release-tags" ruleset lets only those teams, the release team and admins create, move or delete v* tags,
 # except on the odoo repos.
 # Commit comments cannot be set via API, disable them in the org settings instead.
@@ -14,6 +16,7 @@ DRY_RUN=false
 [ $# -gt 0 ] || { echo "Usage: $0 [--dry-run] OWNER/REPO [OWNER/REPO...]" >&2; exit 1; }
 
 RULESET_NAME="main"
+STABLE_RULESET_NAME="stable"
 TAG_RULESET_NAME="release-tags"
 
 # Checks are pinned to the app that reports them, so nobody can fake them via the statuses API
@@ -85,9 +88,10 @@ unit-tests" ;;
   esac
 }
 
+# Usage: ruleset NAME REF_PATTERN CHECKS EXTRA_ALWAYS_BYPASS_TEAM_IDS
 ruleset() {
-  jq -n --arg name "$RULESET_NAME" --argjson checks "$1" \
-      --argjson always "$ALWAYS_BYPASS_TEAM_IDS" --argjson pr "$PR_BYPASS_TEAM_IDS" '{
+  jq -n --arg name "$1" --arg ref "$2" --argjson checks "$3" \
+      --argjson always "$(jq -n "$ALWAYS_BYPASS_TEAM_IDS + $4")" --argjson pr "$PR_BYPASS_TEAM_IDS" '{
     name: $name,
     target: "branch",
     enforcement: "active",
@@ -96,7 +100,7 @@ ruleset() {
       { actor_id: 1, actor_type: "OrganizationAdmin", bypass_mode: "always" },
       { actor_id: 5, actor_type: "RepositoryRole", bypass_mode: "always" }
     ]),
-    conditions: { ref_name: { include: ["~DEFAULT_BRANCH"], exclude: [] } },
+    conditions: { ref_name: { include: [$ref], exclude: [] } },
     rules: ([
       { type: "non_fast_forward" },
       { type: "deletion" },
@@ -162,7 +166,9 @@ for repo in "$@"; do
 
   gh repo edit "$repo" --enable-auto-merge --allow-update-branch --enable-discussions=false
 
-  ruleset "$checks" | upsert_ruleset "$repo" "$RULESET_NAME"
+  ruleset "$RULESET_NAME" "~DEFAULT_BRANCH" "$checks" "[]" | upsert_ruleset "$repo" "$RULESET_NAME"
+  ruleset "$STABLE_RULESET_NAME" "refs/heads/stable-*" "$checks" "[$RELEASE_TEAM_ID]" |
+    upsert_ruleset "$repo" "$STABLE_RULESET_NAME"
   branch=$(gh api "repos/$repo" --jq .default_branch)
   if gh api "repos/$repo/branches/$branch/protection" >/dev/null 2>&1; then
     echo "    removing classic branch protection on $branch"
