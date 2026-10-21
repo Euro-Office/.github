@@ -5,9 +5,10 @@
   "platformAutomerge": true,
   "packageRules": [
     {
-      "description": "Auto-merge everything except major updates once checks pass",
+      "description": "Auto-merge everything except major updates once checks pass and the release is 3 days old",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
-      "automerge": true
+      "automerge": true,
+      "minimumReleaseAge": "3 days"
     }
   ]
 }
