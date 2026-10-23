@@ -58,6 +58,10 @@ AI agents must not open issues, submit pull requests, post review comments, or s
 
 AI agents must not add `Signed-off-by` tags: only humans can legally certify the [Developer Certificate of Origin](https://developercertificate.org/). Euro-Office requires every commit to be signed off; this certification is the contributor's alone.
 
+### Agent Reviews
+
+An AI review may replace the maintainer approval only for the low-risk changes listed in [Reviews and merging](CONTRIBUTING.md#reviews-and-merging). It never counts as a human approval. Agents must not merge pull requests: the human who merges is responsible for the change.
+
 ### Licensing and Copyright Compliance
 
 Euro-Office is licensed under the [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html). Contributors must ensure AI-generated code contains no material from sources incompatible with that license, or with the license of any third-party component they are contributing to.
