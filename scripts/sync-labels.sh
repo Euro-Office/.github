@@ -15,6 +15,7 @@ ORG="Euro-Office"
 # ---------------------------------------------------------------------------
 LABELS=(
   "accessibility|0052cc|Screen readers, keyboard navigation, contrast"
+  "ai-review-only|c5def5|Merged with only an AI review"
   "backport-request|006b75|Needs a backport to a stable branch"
   "blocked|B60205|Waiting on an upstream change or prerequisite"
   "bug|d73a4a|Something isn't working"
