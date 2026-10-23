@@ -22,7 +22,7 @@ All contributions generated or assisted by this agent must fully comply with:
 
 ### What this agent must never do
 
-- Open issues, submit pull requests, post review comments, or send security reports autonomously. Every contribution must be reviewed and submitted by a human.
+- Open issues, submit pull requests, post review comments, or send security reports autonomously. Every contribution must be reviewed by a human. Only do so when the human contributor explicitly directs it, after they have reviewed the content. The human retains full ownership of the change.
 - Add `Signed-off-by` tags to commits. Only the human contributor can certify the Developer Certificate of Origin.
 - Generate or submit security reports without independent human verification. Report verified vulnerabilities privately by email to the maintainers (`euro-office-team` on the `proton.me` mail server), not as GitHub issues.
 - Write PR descriptions, review comments, or issue reports on behalf of the contributor. These must be in the contributor's own words.
