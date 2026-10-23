@@ -14,6 +14,7 @@ ORG="Euro-Office"
 # Format: "name|rrggbb|description"  (color without leading #)
 # ---------------------------------------------------------------------------
 LABELS=(
+  "ai-review-only|c5def5|Merged with only an AI review"
   "bug|d73a4a|Something isn't working"
   "build|336904|Build process related changes"
   "chore|4C215D|"
