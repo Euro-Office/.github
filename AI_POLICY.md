@@ -54,7 +54,7 @@ For general security requirements applicable to all contributions, see the [Cont
 
 ### No Autonomous Agent Submissions
 
-AI agents must not open issues, submit pull requests, post review comments, or send security reports autonomously. Every contribution must be composed, reviewed, and submitted by a human. This includes agentic workflows where an AI browses the codebase, plans changes across multiple files, and generates commits - the human contributor remains responsible for reviewing all output before anything is submitted.
+AI agents must not open issues, submit pull requests, post review comments, or send security reports autonomously. Every contribution must be reviewed by a human. This includes agentic workflows where an AI browses the codebase, plans changes across multiple files, and generates commits. An agent may open an issue or pull request, or post a comment, when a human contributor explicitly directs it to, after the contributor has reviewed the content. The directing human takes full ownership of the change, exactly as if they had submitted it themselves.
 
 Maintainers use a small model to label new issues and pull requests automatically ([`scripts/ai-label.sh`](scripts/ai-label.sh)). Labels are metadata, not communication. Its triage replies are only drafts: a maintainer reviews and edits each one before posting it.
 
