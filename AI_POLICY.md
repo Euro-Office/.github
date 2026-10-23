@@ -40,11 +40,11 @@ Assisted-by: Copilot:gpt-4o
 
 The contributor is the legal and moral author of every line they submit. If a reviewer asks "why does this work this way?" and the answer is "the AI wrote it," the PR will be closed. This applies to code, comments, documentation, and tests alike. You must be able to explain, defend, and modify any content you submit.
 
-### Human-Written Communication
+### Communication
 
-Issues, PR descriptions, and review comments must be in the contributor's own words. Translation assistance and grammar/spelling help are acceptable exceptions and do not need to be disclosed - the intent of this rule is to ensure that the ideas, reasoning, and decisions in community communication come from the contributor.
+Issue descriptions, PR descriptions, and comments may be drafted with AI assistance. Generated text must be written for human readers, short and concise. It must not state assumptions as facts: every claim about behavior, root causes, or test results must be verified by the contributor before posting. The ideas, reasoning, and decisions in community communication must come from the contributor, who must review and stand behind every word. Translation assistance and grammar/spelling help do not need to be disclosed.
 
-This requirement extends through the entire review process. Contributors must respond to reviewer questions and implement requested changes themselves. Passing maintainer feedback into an AI and posting whatever comes out is not an acceptable substitute for genuine engagement. If a contributor cannot explain or implement a requested change because they do not understand their own submission, the PR will be closed.
+This requirement extends through the entire review process. Contributors must understand and address reviewer questions and requested changes themselves. Passing maintainer feedback into an AI and posting whatever comes out without review is not an acceptable substitute for genuine engagement. If a contributor cannot explain or implement a requested change because they do not understand their own submission, the PR will be closed.
 
 ### Security and Dependency Scrutiny
 

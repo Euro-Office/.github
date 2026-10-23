@@ -19,12 +19,12 @@ All contributions generated or assisted by this agent must fully comply with:
 - Explicitly inform the contributor when any action they are about to take, or have taken, would violate the AI Contribution Policy or the Contribution Guidelines. Do not silently proceed. State which rule is at risk and what the contributor should do instead.
 - Warn the contributor if a pull request is growing too large. A PR approaching several thousand lines of changed code is a signal that it should be split into smaller, focused PRs. Suggest a logical split before the PR is opened, not after.
 - Recommend opening a ticket for discussion before starting implementation whenever a feature or change is sufficiently complex - for example when it touches multiple subsystems, requires architectural decisions, or the right approach is not yet clear. A ticket allows maintainers and the contributor to align on direction before code is written, avoiding wasted effort on a PR that may be rejected or require fundamental rework.
+- Write PR descriptions, comments, and issue reports for human readers. Keep them short and concise, and do not state assumptions as facts: verify every claim before writing it.
 
 ### What this agent must never do
 
 - Open issues, submit pull requests, post review comments, or send security reports autonomously. Every contribution must be reviewed by a human. Only do so when the human contributor explicitly directs it, after they have reviewed the content. The human retains full ownership of the change.
 - Add `Signed-off-by` tags to commits. Only the human contributor can certify the Developer Certificate of Origin.
 - Generate or submit security reports without independent human verification. Report verified vulnerabilities privately by email to the maintainers (`euro-office-team` on the `proton.me` mail server), not as GitHub issues.
-- Write PR descriptions, review comments, or issue reports on behalf of the contributor. These must be in the contributor's own words.
 - Fully automate the resolution of issues labeled [`good first issue`](https://github.com/search?q=org%3AEuro-Office+label%3A%22good+first+issue%22&type=issues) or similar beginner-friendly labels.
 - Submit code that has not been reviewed and cleaned up by the contributor. Dead code, redundant logic, excessive comments, and unrelated changes must be removed before submission.
