@@ -39,20 +39,20 @@ repo_checks() {
 build-wasm
 build-wasm-summary
 changes" ;;
-    Euro-Office/DesktopEditors) echo "brand-assets (euro-office, false)
-brand-assets (nextcloud-office, ./brands/nextcloud-office-brand/brand-desktop.hcl, nextcloud-offi...
-build-common (euro-office, desktop-common, Euro-Office, Euro-Office, .)
-build-common (nextcloud-office, no-desktop-common, Nextcloud Office, Nextcloud Office, ./build/br...
-build-linux (amd64, euro-office, Euro-Office, Euro-Office, .)
-build-linux (amd64, nextcloud-office, Nextcloud Office, Nextcloud Office, ./build/brands/nextclou...
-build-linux (arm64, euro-office, Euro-Office, Euro-Office, .)
-build-linux (arm64, nextcloud-office, Nextcloud Office, Nextcloud Office, ./build/brands/nextclou...
-build-macos (euro-office, desktop-apps/macos/Euro-Office.xcodeproj, Euro-Office-arm, Euro-Office....
-build-macos (nextcloud-office, desktop-apps/macos/Euro-Office.xcodeproj, Euro-Office-arm, Nextclo...
-build-windows (amd64, euro-office, Euro-Office, Euro-Office, false)
-build-windows (amd64, nextcloud-office, Nextcloud Office, Nextcloud Office, true)
-build-windows (arm64, euro-office, Euro-Office, Euro-Office, false)
-build-windows (arm64, nextcloud-office, Nextcloud Office, Nextcloud Office, true)
+    Euro-Office/DesktopEditors) echo "brand-assets (euro-office)
+brand-assets (nextcloud-office)
+build-common (euro-office)
+build-common (nextcloud-office)
+build-linux (amd64, euro-office)
+build-linux (amd64, nextcloud-office)
+build-linux (arm64, euro-office)
+build-linux (arm64, nextcloud-office)
+build-macos (euro-office)
+build-macos (nextcloud-office)
+build-windows (amd64, euro-office)
+build-windows (amd64, nextcloud-office)
+build-windows (arm64, euro-office)
+build-windows (arm64, nextcloud-office)
 crosscompile-3rdparty-arm64
 version" ;;
     # Lint, licences and artifact workflows are path-filtered per example, so they can't be required
