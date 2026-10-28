@@ -1,0 +1,6 @@
+{
+    "name": "Require tests",
+    "description": "Require feat and fix PRs that change source files to also change tests.",
+    "iconName": "octicon beaker",
+    "filePatterns": [".*"]
+}
