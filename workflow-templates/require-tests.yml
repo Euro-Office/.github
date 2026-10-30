@@ -18,7 +18,8 @@
 # Each key is optional and replaces its default below. Patterns are bash
 # patterns matched against the whole path, so "*" also matches "/". A file
 # counts as a test if it matches "tests", otherwise as source if it matches
-# "source" and not "ignore".
+# "source" and not "ignore". Deleted files don't count, so removing a test
+# doesn't satisfy the check.
 #
 # SPDX-FileCopyrightText: 2026 Euro-Office contributors
 # SPDX-License-Identifier: MIT
@@ -63,14 +64,23 @@ jobs:
                           '*_test.*' '*.test.*' '*.spec.*')
           source_patterns=('*')
           ignore_patterns=('.github/*' 'docs/*' '*/docs/*' '*.md' 'LICENSE*' '*/LICENSE*'
-                           '*package-lock.json' '*.lock')
-          if config=$(gh api -H "Accept: application/vnd.github.raw" "$CONFIG_URL" 2>/dev/null); then
+                           '*package-lock.json' '*npm-shrinkwrap.json' '*pnpm-lock.yaml' '*.lock'
+                           '*.lock.json' '*go.sum')
+          # only a missing file means defaults, other errors (rate limit, 5xx)
+          # fail the job instead of checking against the wrong patterns
+          if config=$(gh api -H "Accept: application/vnd.github.raw" "$CONFIG_URL" 2>&1); then
             echo "Using .github/require-tests.json"
             for key in tests source ignore; do
               if jq -e --arg k "$key" 'has($k)' <<<"$config" >/dev/null; then
                 mapfile -t "${key}_patterns" < <(jq -r --arg k "$key" '.[$k][]' <<<"$config")
               fi
             done
+          elif [[ "$config" == *"(HTTP 404)"* ]]; then
+            echo "No .github/require-tests.json, using the defaults."
+          else
+            echo "$config"
+            echo "::error::Could not read .github/require-tests.json from the base branch."
+            exit 1
           fi
 
           matches() {
@@ -84,7 +94,7 @@ jobs:
 
           # fetched first, so a failing API call fails the job instead of
           # looking like a PR without files
-          files=$(gh api --paginate "$FILES_URL" --jq '.[].filename')
+          files=$(gh api --paginate "$FILES_URL" --jq '.[] | select(.status != "removed") | .filename')
 
           changed_tests=()
           changed_source=()
