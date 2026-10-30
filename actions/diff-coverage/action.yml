@@ -1,0 +1,76 @@
+# Fails a pull request whose changed lines are not covered enough by tests.
+#
+# Run it in the repository's test job, after the tests wrote a coverage report:
+#
+#   - uses: actions/checkout@v4
+#   - run: ...tests with coverage, writing coverage.xml...
+#   - uses: Euro-Office/.github/actions/diff-coverage@main
+#     with:
+#       reports: coverage.xml
+#       fail-under: 80
+#
+# Only lines the pull request adds or changes are checked, using diff-cover
+# (https://github.com/Bachmann1234/diff_cover), which reads Cobertura XML,
+# LCOV, JaCoCo and Clover reports. The result goes to the job summary.
+#
+# The diff is taken between the merge commit that actions/checkout checks out
+# for a pull request and its first parent, the base branch, so it matches the
+# code the tests ran on.
+#
+# SPDX-FileCopyrightText: 2026 Euro-Office contributors
+# SPDX-License-Identifier: MIT
+
+name: Diff coverage
+description: Fail a pull request whose changed lines are covered less than a given percentage.
+
+inputs:
+  reports:
+    description: Coverage reports (Cobertura XML, LCOV, JaCoCo or Clover), separated by spaces. Globs work.
+    required: true
+  fail-under:
+    description: Minimum coverage of the changed lines, in percent.
+    default: "80"
+  args:
+    description: More diff-cover arguments, for example "--exclude 'third-party/*'" or "--src-roots src/main/java".
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Check coverage of the changed lines
+      shell: bash
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        REPORTS: ${{ inputs.reports }}
+        FAIL_UNDER: ${{ inputs.fail-under }}
+        ARGS: ${{ inputs.args }}
+      run: |
+        if [[ "$EVENT_NAME" != pull_request* ]]; then
+          echo "Not a pull request, nothing to compare."
+          exit 0
+        fi
+
+        # actions/checkout fetches the merge commit without its parents
+        git fetch --no-tags --quiet --depth=2 origin "$(git rev-parse HEAD)"
+        if ! git rev-parse --quiet --verify HEAD^2 >/dev/null; then
+          echo "::error::HEAD is not the pull request's merge commit. Check out the default ref with actions/checkout."
+          exit 1
+        fi
+        diff="$RUNNER_TEMP/diff-coverage.diff"
+        summary="$RUNNER_TEMP/diff-coverage.md"
+        git diff HEAD^1 HEAD >"$diff"
+        rm -f "$summary"
+
+        # word splitting on purpose: several reports, globs and extra arguments
+        status=0
+        # shellcheck disable=SC2086
+        eval "pipx run diff-cover==11.0.0 $REPORTS --diff-file \"\$diff\" --fail-under \"\$FAIL_UNDER\" --format \"markdown:\$summary\" $ARGS" || status=$?
+        if [[ ! -f "$summary" ]]; then
+          echo "::error::diff-cover failed, see the log above."
+          exit 1
+        fi
+        cat "$summary" >>"$GITHUB_STEP_SUMMARY"
+        if (( status )); then
+          echo "::error::Less than $FAIL_UNDER% of the changed lines are covered by tests. Details are in the job summary."
+        fi
+        exit "$status"

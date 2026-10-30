@@ -25,10 +25,12 @@ BYPASS_TEAM_IDS="[18051093, 17868694]" # nextcloud-developers, ionos-developers
 RELEASE_TEAM_ID=20148551 # release, holds eo-robot which tags via release/.github/workflows/tag.yml
 
 # Required on every repo, one "APP_ID check name" per line.
-# conventional-commits comes from workflow-templates/ and is only required where the synced workflow has that job.
+# The TEMPLATE_CHECKS come from workflow-templates/ and are only required where the synced workflow
+# .github/workflows/NAME.yml has a NAME job, so repos opt in by getting the workflow synced.
 GENERAL_CHECKS="$DCO_APP_ID DCO
-$ACTIONS_APP_ID conventional-commits"
-CONVENTIONAL_COMMITS_WORKFLOW=".github/workflows/conventional-commits.yml"
+$ACTIONS_APP_ID conventional-commits
+$ACTIONS_APP_ID require-tests"
+TEMPLATE_CHECKS="conventional-commits require-tests"
 
 # Required per repo, reported by GitHub Actions, one check name per line. Names must match exactly, including the
 # "..." GitHub appends when truncating long matrix job names. Never list jobs from workflows
@@ -140,11 +142,14 @@ upsert_ruleset() {
 for repo in "$@"; do
   echo "==> $repo"
   general=$GENERAL_CHECKS
-  if ! gh api -H "Accept: application/vnd.github.raw" "repos/$repo/contents/$CONVENTIONAL_COMMITS_WORKFLOW" 2>/dev/null |
-      grep -q '^  conventional-commits:$'; then
-    echo "    warning: $CONVENTIONAL_COMMITS_WORKFLOW missing or outdated, not requiring conventional-commits" >&2
-    general=$(grep -v ' conventional-commits$' <<<"$general")
-  fi
+  for check in $TEMPLATE_CHECKS; do
+    workflow=".github/workflows/$check.yml"
+    if ! gh api -H "Accept: application/vnd.github.raw" "repos/$repo/contents/$workflow" 2>/dev/null |
+        grep -q "^  $check:\$"; then
+      echo "    warning: $workflow missing or outdated, not requiring $check" >&2
+      general=$(grep -v " $check\$" <<<"$general")
+    fi
+  done
   checks=$({
     jq -R 'select(. != "") | capture("^(?<integration_id>[0-9]+) (?<context>.+)$") | .integration_id |= tonumber' <<<"$general"
     jq -R --argjson app "$ACTIONS_APP_ID" 'select(. != "") | {context: ., integration_id: $app}' <<<"$(repo_checks "$repo")"
