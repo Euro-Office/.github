@@ -17,8 +17,13 @@ set -euo pipefail
 
 ORG="Euro-Office"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# Labels the model may pick, all of them are defined in sync-labels.sh
-MODEL_LABELS='["bug","enhancement","documentation","question","build","docker","packages","format: odf","format: ooxml","tests","design","regression","high severity"]'
+# Labels the model may pick, all of them are defined in sync-labels.sh. At most 1 type and 2 areas
+MODEL_LABELS='{
+  "type": ["bug", "enhancement", "documentation", "question"],
+  "area": ["build", "docker", "packages", "tests", "design", "performance", "security", "i18n", "integration",
+           "format: odf", "format: ooxml", "format: pdf"],
+  "extra": ["linux", "windows", "macos", "mobile", "regression", "high"]
+}'
 GITHUB_MODEL="openai/gpt-4.1-mini"
 MAX_BODY=4000
 RATE_LIMITED=75
@@ -33,7 +38,7 @@ pr_prefix_label() {
   [[ "${BASH_REMATCH[3]}" == deps* ]] && { echo dependencies; return; }
   case "${BASH_REMATCH[1]}" in
     feat) echo enhancement ;;
-    fix) echo bug ;;
+    fix) [[ "${BASH_REMATCH[3]}" =~ ^(ci|build)$ ]] && echo build || echo bug ;;
     docs) echo documentation ;;
     build|ci) echo build ;;
     test) echo tests ;;
@@ -47,10 +52,11 @@ parse_json() {
     // (capture("(?s)(?<j>\\{.*?\\})").j | fromjson) | objects' 2>/dev/null
 }
 
-# Keeps model labels that are allowlisted and exist in the repo. $1 model JSON, $2 repo labels JSON array
+# Keeps allowlisted model labels in the model's order: at most 1 type, 2 areas, any extras
 filter_labels() {
-  jq -r --argjson allow "$MODEL_LABELS" --argjson repo "$2" \
-    'reduce (.labels[]? | strings | select(IN($allow[]) and IN($repo[]))) as $l ([]; if index([$l]) then . else . + [$l] end) | .[:4][]' <<< "$1"
+  jq -r --argjson g "$MODEL_LABELS" '
+    [.labels[]? | strings] | reduce .[] as $l ([]; if index([$l]) then . else . + [$l] end)
+    | (map(select(IN($g.type[])))[:1] + map(select(IN($g.area[])))[:2] + map(select(IN($g.extra[]))))[]' <<< "$1"
 }
 
 backend() {
@@ -134,7 +140,7 @@ triage_item() {
 }
 
 process_item() {
-  local item="$1" repo number title labels="" out rc=0
+  local item="$1" repo number title labels="" missing="" out rc=0 l
   repo=$(jq -r '.repository_url | sub(".*/repos/"; "")' <<< "$item")
   number=$(jq -r .number <<< "$item")
   title=$(jq -r .title <<< "$item")
@@ -146,18 +152,29 @@ process_item() {
 
   if jq -e .pull_request >/dev/null <<< "$item"; then
     labels=$(pr_prefix_label "$title" "$(jq -r .user.login <<< "$item")")
-    [[ -n "$labels" ]] && ! jq -e --arg l "$labels" 'any(.[]; . == $l)' >/dev/null <<< "$(repo_labels "$repo")" && labels=""
   fi
 
   if [[ -z "$labels" ]]; then
     out=$(item_text "$item" | ask_model "$HERE/ai-label.prompt.md") || rc=$?
     [[ $rc -eq 0 ]] || return "$rc"
     out=$(parse_json <<< "$out") || { log "$repo#$number: unparseable model reply"; return 1; }
-    labels=$(filter_labels "$out" "$(repo_labels "$repo")")
+    labels=$(filter_labels "$out")
   fi
 
+  # Labels the repo lacks are reported, run sync-labels.sh to create them
+  local present=""
+  while IFS= read -r l; do
+    [[ -n "$l" ]] || continue
+    if jq -e --arg l "$l" 'any(.[]; . == $l)' >/dev/null <<< "$(repo_labels "$repo")"; then
+      present+="$l"$'\n'
+    else
+      missing+="${missing:+, }$l"
+    fi
+  done <<< "$labels"
+  labels=${present%$'\n'}
+
   echo "$repo#$number  $title"
-  echo "  labels: $(paste -sd ',' - <<< "${labels:-(none)}")"
+  echo "  labels: $(paste -sd ',' - <<< "${labels:-(none)}")${missing:+ (not in repo: $missing)}"
 
   if [[ -n "$labels" && "$DRY_RUN" == false ]]; then
     local args=()
