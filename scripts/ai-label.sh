@@ -20,7 +20,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Labels the model may pick, all of them are defined in sync-labels.sh. At most 1 type and 2 areas
 MODEL_LABELS='{
   "type": ["bug", "enhancement", "documentation", "question"],
-  "area": ["build", "docker", "packages", "tests", "design", "performance", "security", "i18n", "integration",
+  "area": ["build", "dependencies", "docker", "packages", "tests", "design", "performance", "security", "i18n", "integration",
            "format: odf", "format: ooxml", "format: pdf"],
   "extra": ["linux", "windows", "macos", "mobile", "regression", "high"]
 }'

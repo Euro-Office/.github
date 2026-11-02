@@ -14,6 +14,7 @@ Type, at most 1:
 
 Area, at most 2:
 - build: build process, CI, compiling
+- dependencies: third-party code we build on: updating, porting to, patching or replacing it, or bugs caused by it. For example CEF/Chromium, V8, boost, ICU, Qt, OpenSSL, harfbuzz, npm modules, anything under 3dparty/ or 3rdparty/
 - docker: Docker images, containers, compose setups
 - packages: Linux distribution packages and installers (deb, rpm, snap, flatpak, winget, msi, dmg). Not npm, Node or other code-level packages and modules
 - tests: automated tests
