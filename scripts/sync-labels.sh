@@ -38,6 +38,7 @@ LABELS=(
   "overview|000815|"
   "packages|1376bd|"
   "question|d876e3|Further information is requested"
+  "render-compatibility|1D76DB|Renders differently from MS Office"
   "side task|aaaaaa|"
   "tests|afeab5|"
   "wontfix|ffffff|This will not be worked on"
