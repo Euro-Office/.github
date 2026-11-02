@@ -61,13 +61,7 @@ version" ;;
     # Lint, licences and artifact workflows are path-filtered per example, so they can't be required
     Euro-Office/document-server-integration) echo "e2e" ;;
     Euro-Office/documentation) echo "build" ;;
-    Euro-Office/DocumentServer) echo "build (amd64, euro-office, documentserver, cluster-docs, cluster-example, cluster-utils)
-build (amd64, nextcloud-office, nextcloud-office-documentserver, nextcloud-office-cluster-docs, n...
-build (arm64, euro-office, documentserver, cluster-docs, cluster-example, cluster-utils)
-build (arm64, nextcloud-office, nextcloud-office-documentserver, nextcloud-office-cluster-docs, n...
-clone
-e2e
-upgrade" ;;
+    Euro-Office/DocumentServer) echo "ci-result" ;;
     Euro-Office/eurooffice-nextcloud) echo "Lint
 Packaging filter
 artifact
