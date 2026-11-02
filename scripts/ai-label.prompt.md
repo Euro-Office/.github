@@ -9,7 +9,7 @@ Pick the labels that clearly apply, from this list only:
 - question: a usage question, not a defect or request
 - build: build process, CI, compiling
 - docker: Docker images or containers
-- packages: distribution packages and installers (deb, rpm, snap, flatpak, msi, dmg)
+- packages: Linux distribution packages and installers (deb, rpm, snap, flatpak, msi, dmg). Not npm, Node or other code-level packages and modules
 - format: odf: specific to ODF files (odt, ods, odp)
 - format: ooxml: specific to OOXML files (docx, xlsx, pptx)
 - tests: automated tests
