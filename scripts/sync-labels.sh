@@ -116,7 +116,9 @@ else
   while IFS= read -r repo; do
     [[ "$repo" == *-rehearsal ]] && { log "SKIP $repo"; continue; }
     sync_repo "$repo"
-  done < <(gh repo list "$ORG" --limit 200 --json nameWithOwner --jq '.[].nameWithOwner')
+  # Repos without issues are skipped, e.g. temporary GHSA advisory forks where labels can't be created
+  done < <(gh repo list "$ORG" --limit 200 --json nameWithOwner,hasIssuesEnabled \
+    --jq '.[] | select(.hasIssuesEnabled) | .nameWithOwner')
 fi
 
 log "Done."
