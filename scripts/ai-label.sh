@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Labels open issues and PRs that have no label yet, and can draft a first triage reply.
-# PRs get a label from their conventional commit prefix, everything else asks a small model.
+# Everything asks a small model, except dependency update PRs.
 # Model: GitHub Models inside GitHub Actions, Claude Haiku locally (claude CLI without tools).
 # Usage: ./ai-label.sh [--prs | --issues] [--repo OWNER/REPO | --item OWNER/REPO#N] [--limit N]
 #                      [--dry-run] [--triage [--post]]
@@ -30,20 +30,10 @@ RATE_LIMITED=75
 
 log() { echo "[ai-label] $*" >&2; }
 
-# Prints the label for a conventional commit PR title, nothing if the prefix has no label
-pr_prefix_label() {
-  local title="$1" author="$2" re='^([a-z]+)(\(([^)]*)\))?!?: '
-  case "$author" in renovate\[bot\]|dependabot\[bot\]) echo dependencies; return ;; esac
-  [[ "$title" =~ $re ]] || return 0
-  [[ "${BASH_REMATCH[3]}" == deps* ]] && { echo dependencies; return; }
-  case "${BASH_REMATCH[1]}" in
-    feat) echo enhancement ;;
-    fix) [[ "${BASH_REMATCH[3]}" =~ ^(ci|build)$ ]] && echo build || echo bug ;;
-    docs) echo documentation ;;
-    build|ci) echo build ;;
-    test) echo tests ;;
-    chore) echo chore ;;
-  esac
+# Dependency update PRs are labeled without a model: bot authors or a deps scope
+is_dependency_pr() {
+  local title="$1" author="$2" re='^[a-z]+\(deps(-dev)?\)!?: '
+  [[ "$author" == "renovate[bot]" || "$author" == "dependabot[bot]" || "$title" =~ $re ]]
 }
 
 # Extracts the first JSON object from model output, which may wrap it in prose or code fences
@@ -151,7 +141,7 @@ process_item() {
   fi
 
   if jq -e .pull_request >/dev/null <<< "$item"; then
-    labels=$(pr_prefix_label "$title" "$(jq -r .user.login <<< "$item")")
+    is_dependency_pr "$title" "$(jq -r .user.login <<< "$item")" && labels=dependencies
   fi
 
   if [[ -z "$labels" ]]; then

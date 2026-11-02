@@ -7,13 +7,12 @@ source ./ai-label.sh
 fails=0
 eq() { [[ "$2" == "$3" ]] && echo "ok    $1" || { echo "FAIL  $1: expected '$3', got '$2'"; fails=1; }; }
 
-eq "feat"            "$(pr_prefix_label 'feat(web): add x' alice)" enhancement
-eq "fix breaking"    "$(pr_prefix_label 'fix!: y' alice)" bug
-eq "deps scope"      "$(pr_prefix_label 'chore(deps): bump z' alice)" dependencies
-eq "renovate author" "$(pr_prefix_label 'Update foo' 'renovate[bot]')" dependencies
-eq "ci"              "$(pr_prefix_label 'ci: cache' alice)" build
-eq "refactor"        "$(pr_prefix_label 'refactor: tidy' alice)" ""
-eq "no prefix"       "$(pr_prefix_label 'Add feature' alice)" ""
+dep() { is_dependency_pr "$1" "$2" && echo yes || echo no; }
+eq "deps scope"      "$(dep 'chore(deps): bump z' alice)" yes
+eq "deps-dev scope"  "$(dep 'build(deps-dev): bump z' alice)" yes
+eq "renovate author" "$(dep 'Update foo' 'renovate[bot]')" yes
+eq "other deps scope" "$(dep 'feat(deps-ui): x' alice)" no
+eq "normal PR"       "$(dep 'fix(web): crash' alice)" no
 
 eq "fenced json" "$(printf 'Sure:\n```json\n{"labels": ["bug"]}\n```\n' | parse_json)" '{"labels":["bug"]}'
 
@@ -23,7 +22,6 @@ printf 'No JSON here' | parse_json > /dev/null && { echo "FAIL  prose reply pars
 # Injected or invented labels are dropped, at most 1 type and 2 areas, extras unlimited
 injected='{"labels": ["bug", "wontfix", "question", "admin", "docker", "i18n", "tests", "linux", "high", 3]}'
 eq "allowlist and caps" "$(filter_labels "$injected" | paste -sd , -)" "bug,docker,i18n,linux,high"
-eq "fix(ci)" "$(pr_prefix_label 'fix(ci): auth' alice)" build
 
 for l in $(jq -r '.[][] | @base64' <<< "$MODEL_LABELS"); do
   l=$(base64 -d <<< "$l")
