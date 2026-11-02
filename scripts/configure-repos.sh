@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Applies the org-wide repo settings: auto-merge on, PR branch updates allowed, Discussions off, and a "main"
 # ruleset on the default branch that blocks force pushes and deletions, requires 1 approval and requires
-# the CI checks listed below. The developer teams below may bypass it when merging a PR, org and repo admins always.
+# the CI checks listed below. The PR bypass teams below may bypass it when merging a PR, nextcloud-developers and
+# org and repo admins always. Classic branch protection on the default branch is removed, rulesets replace it.
 # A "release-tags" ruleset lets only those teams, the release team and admins create, move or delete v* tags,
 # except on the odoo repos.
 # Commit comments cannot be set via API, disable them in the org settings instead.
@@ -19,9 +20,9 @@ TAG_RULESET_NAME="release-tags"
 DCO_APP_ID=1861
 ACTIONS_APP_ID=15368
 
-# Teams allowed to merge PRs without approval or passing checks, direct pushes stay blocked
 # gh api orgs/Euro-Office/teams/SLUG --jq .id
-BYPASS_TEAM_IDS="[18051093, 17868694]" # nextcloud-developers, ionos-developers
+ALWAYS_BYPASS_TEAM_IDS="[18051093]" # nextcloud-developers, may also push to main directly
+PR_BYPASS_TEAM_IDS="[17868694]" # ionos-developers, may merge PRs without approval or passing checks
 RELEASE_TEAM_ID=20148551 # release, holds eo-robot which tags via release/.github/workflows/tag.yml
 
 # Required on every repo, one "APP_ID check name" per line.
@@ -86,11 +87,13 @@ unit-tests" ;;
 }
 
 ruleset() {
-  jq -n --arg name "$RULESET_NAME" --argjson checks "$1" --argjson teams "$BYPASS_TEAM_IDS" '{
+  jq -n --arg name "$RULESET_NAME" --argjson checks "$1" \
+      --argjson always "$ALWAYS_BYPASS_TEAM_IDS" --argjson pr "$PR_BYPASS_TEAM_IDS" '{
     name: $name,
     target: "branch",
     enforcement: "active",
-    bypass_actors: ([$teams[] | { actor_id: ., actor_type: "Team", bypass_mode: "pull_request" }] + [
+    bypass_actors: ([$always[] | { actor_id: ., actor_type: "Team", bypass_mode: "always" }]
+      + [$pr[] | { actor_id: ., actor_type: "Team", bypass_mode: "pull_request" }] + [
       { actor_id: 1, actor_type: "OrganizationAdmin", bypass_mode: "always" },
       { actor_id: 5, actor_type: "RepositoryRole", bypass_mode: "always" }
     ]),
@@ -115,7 +118,8 @@ ruleset() {
 }
 
 tag_ruleset() {
-  jq -n --arg name "$TAG_RULESET_NAME" --argjson teams "$BYPASS_TEAM_IDS" --argjson release "$RELEASE_TEAM_ID" '{
+  jq -n --arg name "$TAG_RULESET_NAME" --argjson teams "$(jq -n "$ALWAYS_BYPASS_TEAM_IDS + $PR_BYPASS_TEAM_IDS")" \
+      --argjson release "$RELEASE_TEAM_ID" '{
     name: $name,
     target: "tag",
     enforcement: "active",
@@ -160,5 +164,10 @@ for repo in "$@"; do
   gh repo edit "$repo" --enable-auto-merge --allow-update-branch --enable-discussions=false
 
   ruleset "$checks" | upsert_ruleset "$repo" "$RULESET_NAME"
+  branch=$(gh api "repos/$repo" --jq .default_branch)
+  if gh api "repos/$repo/branches/$branch/protection" >/dev/null 2>&1; then
+    echo "    removing classic branch protection on $branch"
+    gh api -X DELETE "repos/$repo/branches/$branch/protection" >/dev/null
+  fi
   [[ "$repo" == *odoo* ]] || tag_ruleset | upsert_ruleset "$repo" "$TAG_RULESET_NAME"
 done
