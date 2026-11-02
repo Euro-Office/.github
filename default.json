@@ -10,5 +10,23 @@
       "automerge": true,
       "minimumReleaseAge": "3 days"
     }
+  ],
+  "customManagers": [
+    {
+      "description": "Node major installed from NodeSource in Dockerfiles (setup_XX.x)",
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/)[^/]*Dockerfile$/"],
+      "matchStrings": ["deb\\.nodesource\\.com/setup_(?<currentValue>\\d+)\\.x"],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version"
+    },
+    {
+      "description": "Node major set as NODE_VERSION env in workflows",
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/[^/]+\\.ya?ml$/"],
+      "matchStrings": ["NODE_VERSION:\\s*['\"]?(?<currentValue>\\d+)['\"]?"],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version"
+    }
   ]
 }
