@@ -1,0 +1,36 @@
+# This workflow is provided via the organization template repository
+#
+# https://github.com/Euro-Office/.github
+# https://docs.github.com/en/actions/learn-github-actions/sharing-workflows-with-your-organization
+#
+# SPDX-FileCopyrightText: Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: MIT
+
+name: AI label
+
+on:
+  issues:
+    types: [opened]
+  # Runs for fork PRs too. Safe because no PR code is checked out or run
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+  models: read
+
+jobs:
+  ai-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label with a small model
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ITEM: ${{ github.repository }}#${{ github.event.issue.number || github.event.pull_request.number }}
+        run: |
+          mkdir ai-label && cd ai-label
+          for f in ai-label.sh ai-label.prompt.md; do
+            gh api -H 'Accept: application/vnd.github.raw' "repos/Euro-Office/.github/contents/scripts/$f" > "$f"
+          done
+          bash ai-label.sh --item "$ITEM"
