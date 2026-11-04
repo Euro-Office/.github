@@ -28,20 +28,31 @@ LABELS=(
   "epic|9f615a|"
   "format: odf|aaaaaa|"
   "format: ooxml|aaaaaa|"
+  "format: pdf|aaaaaa|"
   "good first issue|7057ff|Good for newcomers"
+  "high|b60205|High severity: data loss, crash, security or core feature unusable"
   "help wanted|008672|Extra attention is needed"
+  "i18n|c5def5|Translations, languages, right-to-left scripts"
+  "integration|bfd4f2|Nextcloud, WOPI and other hosting integrations"
   "invalid|e4e669|This doesn't seem right"
+  "linux|1d76db|"
+  "macos|1d76db|"
+  "mobile|1d76db|iOS, iPadOS and Android"
   "nc-report|0082c9|Nextcloud testing reports"
   "internal-report|003d8f|Internal testing reports"
   "needs info|aaaaaa|"
   "organizational|aaaaaa|"
   "overview|000815|"
   "packages|1376bd|"
+  "performance|111111|"
   "question|d876e3|Further information is requested"
+  "regression|e99695|Worked in an earlier version"
   "render-compatibility|1D76DB|Renders differently from MS Office"
+  "security|ee0701|Hardening and privacy, report vulnerabilities privately"
   "side task|aaaaaa|"
   "tests|afeab5|"
   "wontfix|ffffff|This will not be worked on"
+  "windows|1d76db|"
 )
 
 DRY_RUN=false
@@ -105,7 +116,9 @@ else
   while IFS= read -r repo; do
     [[ "$repo" == *-rehearsal ]] && { log "SKIP $repo"; continue; }
     sync_repo "$repo"
-  done < <(gh repo list "$ORG" --limit 200 --json nameWithOwner --jq '.[].nameWithOwner')
+  # Repos without issues are skipped, e.g. temporary GHSA advisory forks where labels can't be created
+  done < <(gh repo list "$ORG" --limit 200 --json nameWithOwner,hasIssuesEnabled \
+    --jq '.[] | select(.hasIssuesEnabled) | .nameWithOwner')
 fi
 
 log "Done."
