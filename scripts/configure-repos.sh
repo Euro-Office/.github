@@ -62,7 +62,6 @@ build-windows (amd64, euro-office)
 build-windows (amd64, nextcloud-office)
 build-windows (arm64, euro-office)
 build-windows (arm64, nextcloud-office)
-crosscompile-3rdparty-arm64
 version" ;;
     # Lint, licences and artifact workflows are path-filtered per example, so they can't be required
     Euro-Office/document-server-integration) echo "e2e" ;;
