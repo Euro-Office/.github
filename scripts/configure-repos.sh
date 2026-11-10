@@ -38,10 +38,16 @@ TEMPLATE_CHECKS="conventional-commits require-tests"
 # with pull_request paths filters: they never report on unrelated PRs and block merging.
 repo_checks() {
   case "$1" in
-    Euro-Office/core) echo "build
+    Euro-Office/core) echo "build (android, arm64-v8a)
+build (android, x86_64)
+build (desktop, ubuntu, arm64)
+build (macos, arm64)
+build (server, rocky9, amd64)
+build (server, rocky9, arm64)
+build (windows, arm64)
+build (windows, x64)
 build-wasm
-build-wasm-summary
-changes" ;;
+build-wasm-summary" ;;
     Euro-Office/DesktopEditors) echo "brand-assets (euro-office)
 brand-assets (nextcloud-office)
 build-common (euro-office)
