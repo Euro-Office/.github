@@ -32,6 +32,7 @@ LABELS=(
   "good first issue|7057ff|Good for newcomers"
   "help wanted|008672|Extra attention is needed"
   "invalid|e4e669|This doesn't seem right"
+  "major-update|b60205|Major dependency update, needs a human review"
   "nc-report|0082c9|Nextcloud testing reports"
   "internal-report|003d8f|Internal testing reports"
   "needs info|aaaaaa|"
