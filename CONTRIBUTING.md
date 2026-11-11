@@ -54,7 +54,7 @@ Maintainers who may bypass the approval rule (see [`configure-repos.sh`](https:/
 
 ### Auto-merge
 
-Renovate updates, except major versions, merge automatically once CI passes and the release is 3 days old. Major updates get the `major-update` label and need a human review.
+Renovate updates, except major versions and lock file maintenance, merge automatically once CI passes and the release is 3 days old. Major updates get the `major-update` label and need a human review.
 
 ## AI-assisted contributions
 
