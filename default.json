@@ -9,6 +9,17 @@
       "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
       "automerge": true,
       "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "One PR for all non-major GitHub Actions updates instead of one per action",
+      "groupName": "GitHub Actions",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
+    },
+    {
+      "description": "webpack and its CLI and minifier plugin share peer ranges, so update them together",
+      "groupName": "webpack",
+      "matchPackageNames": ["webpack", "webpack-cli", "terser-webpack-plugin"]
     }
   ]
 }
