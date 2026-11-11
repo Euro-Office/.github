@@ -1,0 +1,45 @@
+# This workflow is provided via the organization template repository
+#
+# https://github.com/Euro-Office/.github
+# https://docs.github.com/en/actions/learn-github-actions/sharing-workflows-with-your-organization
+#
+# Comments on merged PRs that have neither an approving review nor the
+# "ai-review-only" label, see CONTRIBUTING.md "Reviews and merging".
+#
+# SPDX-FileCopyrightText: 2026 Euro-Office contributors
+# SPDX-License-Identifier: MIT
+
+name: Merge review check
+
+on:
+  pull_request_target: # zizmor: ignore[dangerous-triggers] no checkout, only reads the PR via the API
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  merge-review-check:
+    if: ${{
+      github.event.pull_request.merged
+      && !contains(github.event.pull_request.labels.*.name, 'ai-review-only')
+      }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Flag merges without approval or ai-review-only label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          REVIEWS_URL: ${{ github.event.pull_request.url }}/reviews
+        run: |
+          approved=$(gh api --paginate "$REVIEWS_URL" --jq '.[] | select(.state == "APPROVED") | .id')
+          if [[ -n "$approved" ]]; then
+            echo "Approved, nothing to flag."
+            exit 0
+          fi
+          msg="Merged without an approving review or the \`ai-review-only\` label. Please add a review or the label, see [Reviews and merging](https://github.com/Euro-Office/.github/blob/main/CONTRIBUTING.md#reviews-and-merging)."
+          echo "::warning::$msg"
+          gh pr comment "$PR_URL" --body "$msg"

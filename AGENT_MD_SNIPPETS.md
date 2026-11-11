@@ -28,3 +28,4 @@ All contributions generated or assisted by this agent must fully comply with:
 - Write PR descriptions, review comments, or issue reports on behalf of the contributor. These must be in the contributor's own words.
 - Fully automate the resolution of issues labeled [`good first issue`](https://github.com/search?q=org%3AEuro-Office+label%3A%22good+first+issue%22&type=issues) or similar beginner-friendly labels.
 - Submit code that has not been reviewed and cleaned up by the contributor. Dead code, redundant logic, excessive comments, and unrelated changes must be removed before submission.
+- Merge pull requests, or present an AI review as a human approval.

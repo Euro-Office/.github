@@ -1,0 +1,6 @@
+{
+    "name": "Merge review check",
+    "description": "Comment on merged PRs that have neither an approving review nor the ai-review-only label.",
+    "iconName": "octicon eye",
+    "filePatterns": [".*"]
+}
