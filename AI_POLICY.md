@@ -54,9 +54,9 @@ For general security requirements applicable to all contributions, see the [Cont
 
 ### No Autonomous Agent Submissions
 
-AI agents must not open issues, submit pull requests, post review comments, or send security reports autonomously. Every contribution must be reviewed by a human. This includes agentic workflows where an AI browses the codebase, plans changes across multiple files, and generates commits. An agent may open an issue or pull request, or post a comment, when a human contributor explicitly directs it to, after the contributor has reviewed the content. The directing human takes full ownership of the change, exactly as if they had submitted it themselves.
+AI agents must not open issues, submit pull requests, post comments or reviews, or send security reports autonomously. Every contribution must be reviewed by a human. This includes agentic workflows where an AI browses the codebase, plans changes across multiple files, and generates commits. An agent may open an issue or pull request, post a comment, or submit a review (Comment, Request changes, or Approve) when a human contributor explicitly directs it to, after the contributor has reviewed the content. An Approve counts as a human approval only if the contributor reviewed the change themselves; the agent only submits it. The directing human takes full ownership of the change, exactly as if they had submitted it themselves.
 
-AI agents must not add `Signed-off-by` tags: only humans can legally certify the [Developer Certificate of Origin](https://developercertificate.org/). Euro-Office requires every commit to be signed off; this certification is the contributor's alone.
+AI agents may add a `Signed-off-by` tag (e.g. `git commit -s`) only when the contributor explicitly tells them to: that instruction is the contributor's certification of the [Developer Certificate of Origin](https://developercertificate.org/). Euro-Office requires every commit to be signed off.
 
 ### Licensing and Copyright Compliance
 
