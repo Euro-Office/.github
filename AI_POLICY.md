@@ -56,6 +56,8 @@ For general security requirements applicable to all contributions, see the [Cont
 
 AI agents must not open issues, submit pull requests, post review comments, or send security reports autonomously. Every contribution must be composed, reviewed, and submitted by a human. This includes agentic workflows where an AI browses the codebase, plans changes across multiple files, and generates commits - the human contributor remains responsible for reviewing all output before anything is submitted.
 
+Maintainers use a small model to label new issues and pull requests automatically ([`scripts/ai-label.sh`](scripts/ai-label.sh)). Labels are metadata, not communication. Its triage replies are only drafts: a maintainer reviews and edits each one before posting it.
+
 AI agents must not add `Signed-off-by` tags: only humans can legally certify the [Developer Certificate of Origin](https://developercertificate.org/). Euro-Office requires every commit to be signed off; this certification is the contributor's alone.
 
 ### Licensing and Copyright Compliance

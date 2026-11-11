@@ -1,0 +1,6 @@
+{
+    "name": "AI label",
+    "description": "Label new issues and PRs from their conventional commit prefix or with a small model.",
+    "iconName": "octicon tag",
+    "filePatterns": [".*"]
+}
