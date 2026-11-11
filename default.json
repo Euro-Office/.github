@@ -9,6 +9,11 @@
       "matchUpdateTypes": ["minor", "patch", "pin", "digest", "lockFileMaintenance"],
       "automerge": true,
       "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Label major updates so renovate-approve-merge does not approve them",
+      "matchUpdateTypes": ["major"],
+      "addLabels": ["major-update"]
     }
   ]
 }

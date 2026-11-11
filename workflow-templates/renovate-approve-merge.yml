@@ -42,8 +42,16 @@ jobs:
 
       # Auto-merge of non-major updates is enabled by Renovate itself via the
       # shared preset: "extends": ["github>Euro-Office/.github"]
+      # Labels come from the API: Renovate adds them right after opening the PR,
+      # so the event payload of "opened" has none.
       - name: GitHub actions bot approve
-        run: gh pr review --approve "$PR_URL"
+        run: |
+          major=$(gh pr view "$PR_URL" --json labels --jq 'any(.labels[]; .name == "major-update")')
+          if [[ "$major" == true ]]; then
+            echo 'Major update, needs a human review'
+            exit 0
+          fi
+          gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.EO_ROBOT_GITHUB_TOKEN }}

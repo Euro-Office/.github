@@ -49,6 +49,7 @@ LABELS=(
   "linux|1d76db|"
   "log-finding|cccccc|Log finding"
   "macos|1d76db|"
+  "major-update|b60205|Major dependency update, needs a human review"
   "mobile|1d76db|iOS, iPadOS and Android"
   "nc-report|0082c9|Nextcloud testing reports"
   "internal-report|003d8f|Internal testing reports"
