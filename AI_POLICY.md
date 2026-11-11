@@ -50,7 +50,7 @@ This requirement extends through the entire review process. Contributors must re
 
 AI tools hallucinate package names, produce subtly broken access controls, and may reproduce vulnerable patterns from their training data. Contributors must manually verify all dependencies, access control logic, authentication patterns, and security implications in AI-generated code before submitting - the risk of undetected errors is higher than with hand-written code and warrants extra care.
 
-For general security requirements applicable to all contributions, see the [Contribution Guidelines](CONTRIBUTING.md). Security vulnerabilities must be reported privately by email to the maintainers (`euro-office-team` on the `proton.me` mail server), not via public issues. AI-generated security reports must be independently verified before submission; unverified reports might be closed without response.
+For general security requirements applicable to all contributions, see the [Contribution Guidelines](CONTRIBUTING.md). Security vulnerabilities must be reported privately, through [Euro-Office/security-advisories](https://github.com/Euro-Office/security-advisories/security/advisories/new) or by email to the maintainers (`euro-office-team` on the `proton.me` mail server), not via public issues. AI-generated security reports must be independently verified before submission; unverified reports might be closed without response.
 
 ### No Autonomous Agent Submissions
 
