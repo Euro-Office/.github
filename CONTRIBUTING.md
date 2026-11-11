@@ -19,7 +19,7 @@ Commits are required to be signed off. By adding a `Signed-off-by` trailer (`git
 
 ## Reviews and merging
 
-Human review time should go where it matters: community contributions, risky areas, and anyone who asks for it. Maintainers are the members of the [Euro-Office GitHub organization](https://github.com/orgs/Euro-Office/people).
+Human review time should go where it matters: community contributions, risky areas, and anyone who asks for it. Maintainers are the human members of the [Euro-Office GitHub organization](https://github.com/orgs/Euro-Office/people), bot accounts such as eo-robot are not.
 
 * Whoever merges is responsible for the change. "The AI approved it" is no excuse.
 * Humans decide: the AI review is input, a maintainer makes the call, except for [auto-merges](#auto-merge).
@@ -35,13 +35,13 @@ Every pull request needs approval from at least one maintainer, except the low-r
 * Licensing: legal text, upstream changes, differently licensed components
 * Security and privacy: authentication, JWT, new network calls, changed defaults
 * Document core: x2t converters, format readers and writers, co-editing
-* Build and release: CI workflows, build and release scripts
+* Build and release: CI workflows, build and release scripts, except [auto-merged](#auto-merge) Renovate bumps of SHA-pinned actions
 * Governance: CODEOWNERS, branch protection, contribution and AI policies
 * Contributions from first-time or external contributors
 
 ### AI review only
 
-Maintainers may merge their own pull request after reviewing it themselves, with only an AI review on top, if it touches nothing from the list above. Add the `ai-review-only` label so this stays visible.
+Maintainers who may bypass the approval rule (see [`configure-repos.sh`](https://github.com/Euro-Office/.github/blob/main/scripts/configure-repos.sh)) may merge their own pull request after reviewing it themselves, with only an AI review on top, if it touches nothing from the list above and CI passes. The AI review must be posted on the pull request, as a review or comment. Add the `ai-review-only` label so this stays visible: merges with neither an approval nor the label get flagged.
 
 * Docs, typos and translation syncs, but not legal text, privacy notices or new string keys
 * Tests that add coverage, never skipping or deleting a failing test
@@ -54,7 +54,7 @@ Maintainers may merge their own pull request after reviewing it themselves, with
 
 ### Auto-merge
 
-Renovate and Dependabot updates, except major versions, merge automatically once CI passes. Renovate also waits until a release is 3 days old.
+Renovate updates, except major versions, merge automatically once CI passes and the release is 3 days old. Major updates get the `major-update` label and need a human review.
 
 ## AI-assisted contributions
 
