@@ -14,6 +14,7 @@ ORG="Euro-Office"
 # Format: "name|rrggbb|description"  (color without leading #)
 # ---------------------------------------------------------------------------
 LABELS=(
+  "backport-request|006b75|Needs a backport to a stable branch"
   "bug|d73a4a|Something isn't working"
   "build|336904|Build process related changes"
   "chore|4C215D|"
