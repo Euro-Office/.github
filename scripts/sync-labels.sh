@@ -49,6 +49,7 @@ LABELS=(
   "question|d876e3|Further information is requested"
   "regression|e99695|Worked in an earlier version"
   "render-compatibility|1D76DB|Renders differently from MS Office"
+  "roadmap|0e8a16|Track on the team project board"
   "security|ee0701|Hardening and privacy, report vulnerabilities privately"
   "side task|aaaaaa|"
   "tests|afeab5|"
