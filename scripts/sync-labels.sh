@@ -130,9 +130,9 @@ else
   while IFS= read -r repo; do
     [[ "$repo" == *-rehearsal ]] && { log "SKIP $repo"; continue; }
     sync_repo "$repo"
-  # Repos without issues are skipped, e.g. temporary GHSA advisory forks where labels can't be created
-  done < <(gh repo list "$ORG" --limit 200 --json nameWithOwner,hasIssuesEnabled \
-    --jq '.[] | select(.hasIssuesEnabled) | .nameWithOwner')
+  # Repos without issues (e.g. temporary GHSA advisory forks) and archived repos are read-only for labels
+  done < <(gh repo list "$ORG" --limit 200 --json nameWithOwner,hasIssuesEnabled,isArchived \
+    --jq '.[] | select(.hasIssuesEnabled and (.isArchived | not)) | .nameWithOwner')
 fi
 
 log "Done."
