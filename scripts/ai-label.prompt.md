@@ -25,7 +25,11 @@ Area, at most 2:
 - integration: hosting integrations: Nextcloud, WOPI, Seafile, connectors, the integration API
 - format: odf: the item names ODF files (odt, ods, odp)
 - format: ooxml: the item names OOXML files (docx, xlsx, pptx)
-- format: pdf: the item is about PDF files or the PDF editor
+- format: pdf: the item names PDF files
+- editor: document, editor: spreadsheet, editor: presentation, editor: pdf: the item is about that editor (features, UI, editing, rendering while editing)
+- desktop: the desktop apps on all operating systems
+- collaboration: co-editing, comments, tracked changes, sharing
+- accessibility: screen readers, keyboard navigation, contrast
 Only use a format label when the problem is about reading or writing that file format: opening, saving, converting, import, export, round trip, fidelity. Editing features, UI, input or crashes while editing are not format issues, even in a docx or xlsx file. Never guess one.
 
 Extra, any number:

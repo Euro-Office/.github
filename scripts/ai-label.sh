@@ -21,7 +21,8 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MODEL_LABELS='{
   "type": ["bug", "enhancement", "documentation", "question"],
   "area": ["build", "dependencies", "docker", "packages", "tests", "design", "performance", "security", "i18n", "integration",
-           "format: odf", "format: ooxml", "format: pdf"],
+           "format: odf", "format: ooxml", "format: pdf", "editor: document", "editor: spreadsheet", "editor: presentation",
+           "editor: pdf", "desktop", "collaboration", "accessibility"],
   "extra": ["linux", "windows", "macos", "mobile", "regression", "high"]
 }'
 GITHUB_MODEL="openai/gpt-4.1-mini"
