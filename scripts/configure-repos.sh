@@ -48,21 +48,7 @@ build (windows, arm64)
 build (windows, x64)
 build-wasm
 build-wasm-summary" ;;
-    Euro-Office/DesktopEditors) echo "brand-assets (euro-office)
-brand-assets (nextcloud-office)
-build-common (euro-office)
-build-common (nextcloud-office)
-build-linux (amd64, euro-office)
-build-linux (amd64, nextcloud-office)
-build-linux (arm64, euro-office)
-build-linux (arm64, nextcloud-office)
-build-macos (euro-office)
-build-macos (nextcloud-office)
-build-windows (amd64, euro-office)
-build-windows (amd64, nextcloud-office)
-build-windows (arm64, euro-office)
-build-windows (arm64, nextcloud-office)
-version" ;;
+    Euro-Office/DesktopEditors) echo "ci-result" ;;
     # Lint, licences and artifact workflows are path-filtered per example, so they can't be required
     Euro-Office/document-server-integration) echo "e2e" ;;
     Euro-Office/documentation) echo "build" ;;
