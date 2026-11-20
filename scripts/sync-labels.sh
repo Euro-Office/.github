@@ -15,6 +15,7 @@ ORG="Euro-Office"
 # ---------------------------------------------------------------------------
 LABELS=(
   "accessibility|0052cc|Screen readers, keyboard navigation, contrast"
+  "ai-review-only|c5def5|Merged with only an AI review"
   "backport-request|006b75|Needs a backport to a stable branch"
   "blocked|B60205|Waiting on an upstream change or prerequisite"
   "bug|d73a4a|Something isn't working"
@@ -48,6 +49,7 @@ LABELS=(
   "linux|1d76db|"
   "log-finding|cccccc|Log finding"
   "macos|1d76db|"
+  "major-update|b60205|Major dependency update, needs a human review"
   "mobile|1d76db|iOS, iPadOS and Android"
   "nc-report|0082c9|Nextcloud testing reports"
   "internal-report|003d8f|Internal testing reports"
