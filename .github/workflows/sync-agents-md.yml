@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: MIT
+
+name: Sync AGENTS.md policy to repos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - AGENT_MD_SNIPPETS.md
+      - scripts/sync-agents-md.sh
+  pull_request:
+    paths:
+      - AGENT_MD_SNIPPETS.md
+      - scripts/sync-agents-md.sh
+      - scripts/test-sync-agents-md.sh
+      - .github/workflows/sync-agents-md.yml
+  workflow_dispatch:
+    inputs:
+      repos:
+        description: Space separated OWNER/REPO list; the block is added where missing. Empty updates org repos that already have it.
+        required: false
+        default: ""
+      dry-run:
+        description: Only print planned changes
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-agents-md
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Test
+        run: ./scripts/test-sync-agents-md.sh
+
+      - name: Sync
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.EO_ROBOT_GITHUB_TOKEN }}
+          REPOS: ${{ inputs.repos }}
+          DRY_RUN: ${{ inputs.dry-run }}
+        run: |
+          args=()
+          [[ "$DRY_RUN" == true ]] && args+=(--dry-run)
+          for repo in $REPOS; do args+=(--repo "$repo"); done
+          ./scripts/sync-agents-md.sh "${args[@]}"
