@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Applies the org-wide repo settings: auto-merge on, PR branch updates allowed, Discussions off, and a "main"
-# ruleset on the default branch that blocks force pushes and deletions, requires 1 approval and requires
-# the CI checks listed below. The PR bypass teams below may bypass it when merging a PR, nextcloud-developers and
-# org and repo admins always. Classic branch protection on the default branch is removed, rulesets replace it.
+# Applies the org-wide repo settings: auto-merge on, PR branch updates allowed, head branches deleted on merge,
+# Discussions off, and a "main" ruleset on the default branch that blocks force pushes and deletions, requires
+# 1 approval and requires the CI checks listed below. The PR bypass teams below may bypass it when merging a PR,
+# nextcloud-developers and org and repo admins always. Classic branch protection on the default branch is removed, rulesets replace it.
 # A "release-tags" ruleset lets only those teams, the release team and admins create, move or delete v* tags,
 # except on the odoo repos.
 # Commit comments cannot be set via API, disable them in the org settings instead.
@@ -146,7 +146,7 @@ for repo in "$@"; do
   jq -r '"    required checks:", (.[] | "      - \(.context)")' <<<"$checks"
   $DRY_RUN && continue
 
-  gh repo edit "$repo" --enable-auto-merge --allow-update-branch --enable-discussions=false
+  gh repo edit "$repo" --enable-auto-merge --allow-update-branch --delete-branch-on-merge --enable-discussions=false
 
   ruleset "$checks" | upsert_ruleset "$repo" "$RULESET_NAME"
   branch=$(gh api "repos/$repo" --jq .default_branch)
